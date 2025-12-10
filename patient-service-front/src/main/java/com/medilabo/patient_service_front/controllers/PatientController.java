@@ -1,6 +1,8 @@
 package com.medilabo.patient_service_front.controllers;
 
 import com.medilabo.patient_service_front.models.Patient;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -21,6 +23,14 @@ public class PatientController {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    private EurekaClient discoveryClient;
+
+    public String gatewayUrl() {
+        InstanceInfo instance = discoveryClient.getNextServerFromEureka("api-gateway-reactive", false);
+        return instance.getHomePageUrl();
+    }
 
     @GetMapping("patient/list")
     public String patientList(Model model) {
@@ -84,7 +94,7 @@ public class PatientController {
 
         if (response.getStatusCode().is2xxSuccessful()) {
             redirectAttributes.addFlashAttribute("successMessage", "Patient updated !");
-            return "redirect:/patient/list";
+            return "redirect:" + gatewayUrl() + "patient/list";
         } else {
             //TODO ADD AN ERROR MESSAGE TO THE VIEW
             model.addAttribute("patient", patient);
@@ -127,7 +137,7 @@ public class PatientController {
 
         if (response.getStatusCode().is2xxSuccessful()) {
             redirectAttributes.addFlashAttribute("successMessage", "Patient created !");
-            return "redirect:/patient/list";
+            return "redirect:" + gatewayUrl() + "patient/list";
         } else {
             //TODO error message to display
             model.addAttribute("patient", patient);
@@ -143,7 +153,7 @@ public class PatientController {
         restTemplate.delete(
                 "http://patient-service-back/patient/delete/" + id
         );
-        return "redirect:/patient/list";
+        return "redirect:" + gatewayUrl() + "patient/list";
     }
 
 
