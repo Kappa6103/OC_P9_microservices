@@ -4,7 +4,11 @@ import com.medilabo.patient.models.Patient;
 import com.medilabo.patient.repositories.PatientRepository;
 import com.medilabo.patient.services.PatientService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 public class PatientController {
 
@@ -30,60 +35,72 @@ public class PatientController {
     }
 
     @GetMapping("patient/update/{id}")
-    public String showUpdateForm(@PathVariable int id, Model model) {
+    public Patient showUpdateForm(@PathVariable int id) {
         Optional<Patient> optionalPatient = repo.findById(id);
         if (optionalPatient.isEmpty()) {
             throw new IllegalArgumentException("Patient's id doesn't exist: " + id);
         }
-        model.addAttribute("patient", optionalPatient.get());
-        return "patientUpdate";
+        return optionalPatient.get();
     }
 
-    @PostMapping("/patient/update")
-    public String updatePatient(
-            @Valid Patient patient,
+//    @PostMapping("/update")
+//    public ResponseEntity<Patient> updatePatient(@Valid @RequestBody Patient patient) {
+//        try {
+//            Patient updatedPatient = patientService.update(patient);
+//            if (updatedPatient != null) {
+//                return ResponseEntity.ok(updatedPatient);
+//            } else {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.badRequest().build();
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+
+
+    @PutMapping("/patient/update")
+    public ResponseEntity<Patient> updatePatient(
+            @Valid @RequestBody Patient patient,
             BindingResult result,
             Model model,
             RedirectAttributes redirectAttributes
     ) {
+        log.info("post mapping hit with patient : {} ", patient.toString());
+
         if (result.hasErrors()) {
-            model.addAttribute("patient", patient);
-            model.addAttribute("result", result);
-            return "patientUpdate";
+            return ResponseEntity.badRequest().build();
         }
+
         repo.save(patient);
-        redirectAttributes.addFlashAttribute("successMessage", "Patient updated !");
-        return "redirect:/patient/list";
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("patient/add")
-    public String showAddPatient(Model model) {
-        model.addAttribute("patient", new Patient());
-        return "patientCreate";
-    }
+//    @GetMapping("patient/add")
+//    public String showAddPatient(Model model) {
+//        model.addAttribute("patient", new Patient());
+//        return "patientCreate";
+//    }
 
     @PostMapping("/patient/add")
-    public String createPatient(
-            @Valid Patient patient,
-            BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttributes
+    public ResponseEntity<Patient> createPatient(
+            @RequestBody Patient patient,
+            BindingResult result
     ) {
         if (result.hasErrors()) {
-            model.addAttribute("patient", patient);
-            model.addAttribute("result", result);
-            return "patientCreate";
+            return ResponseEntity.badRequest().build();
         }
         repo.save(patient);
-        redirectAttributes.addFlashAttribute("successMessage", "Patient created !");
-        return "redirect:/patient/list";
+        return ResponseEntity.ok().build();
     }
 
     //TODO confirmer avant delete
-    @GetMapping("patient/delete/{id}")
-    public String deletePatient(@PathVariable int id, Model model) {
+    @DeleteMapping("patient/delete/{id}")
+    public void deletePatient(@PathVariable int id) {
         repo.deleteById(id);
-        return "redirect:/patient/list";
+
     }
 
 

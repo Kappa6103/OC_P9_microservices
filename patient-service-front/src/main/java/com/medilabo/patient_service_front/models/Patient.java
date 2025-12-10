@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Setter
 public class Patient {
 
-    @NotNull
     private int id;
 
     @NotBlank

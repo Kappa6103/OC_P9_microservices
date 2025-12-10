@@ -4,8 +4,7 @@ import com.medilabo.patient_service_front.models.Patient;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,7 +39,7 @@ public class PatientController {
     @GetMapping("patient/update/{id}")
     public String showUpdateForm(@PathVariable int id, Model model) {
         Patient patient = restTemplate.getForObject(
-                "http://localhost:8080/update" + id,
+                "http://localhost:8080/patient/update/" + id,
                 Patient.class);
 
         model.addAttribute("patient", patient);
@@ -59,10 +58,30 @@ public class PatientController {
             model.addAttribute("result", result);
             return "patientUpdate";
         }
-        ResponseEntity<Patient> response = restTemplate.postForEntity(
+        HttpEntity<Patient> request = new HttpEntity<>(patient);
+        ResponseEntity<Patient> response = restTemplate.exchange(
                 "http://localhost:8080/patient/update",
-                patient,
-                Patient.class);
+                HttpMethod.PUT,
+                request,
+                Patient.class
+        );
+
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
+//        ResponseEntity<Patient> response = restTemplate.exchange(
+//                "http://localhost:8080/patient/update",
+//                HttpMethod.POST,
+//                request,
+//                Patient.class
+//        );
+
+
+//        ResponseEntity<Patient> response = restTemplate.postForEntity(
+//                "http://localhost:8080/patient/update",
+//                patient,
+//                Patient.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             redirectAttributes.addFlashAttribute("successMessage", "Patient updated !");
@@ -94,10 +113,19 @@ public class PatientController {
             model.addAttribute("result", result);
             return "patientCreate";
         }
-        ResponseEntity<Patient> response = restTemplate.postForEntity(
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
+        System.out.println(request.hasBody());
+        ResponseEntity<Patient> response = restTemplate.exchange(
                 "http://localhost:8080/patient/add",
-                patient,
-                Patient.class);
+                HttpMethod.POST,
+                request,
+                Patient.class
+        );
+
         if (response.getStatusCode().is2xxSuccessful()) {
             redirectAttributes.addFlashAttribute("successMessage", "Patient created !");
             return "redirect:/patient/list";
