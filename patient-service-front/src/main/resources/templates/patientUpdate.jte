@@ -1,9 +1,8 @@
-@import com.medilabo.patient.models.Patient
+@import com.medilabo.patient_service_front.models.*
 @import org.springframework.validation.BindingResult
-@import com.medilabo.patient.models.Gender
 @param Patient patient
 @param BindingResult result
-
+<!-- dsdfsdf -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -18,11 +17,13 @@
 <a href="/patient/list">
     <h1>retour a la liste</h1>
 </a>
-    <h1>Page de creation</h1>
-<form action="/patient/add" method="post">
+<form action="/patient/update" method="post">
+    <input type="hidden" name="id" value="${patient.getId()}">
+
     <label for="fname">First name</label>
     <input id="fname"
            type="text"
+           value="${patient.getFirstName()}"
            name="firstName"
     >
     @if(result != null && result.hasFieldErrors("firstName"))
@@ -32,6 +33,7 @@
     <label for="lname">Last name</label>
     <input id="lname"
            type="text"
+           value="${patient.getLastName()}"
            name="lastName"
     >
     @if(result != null && result.hasFieldErrors("lastName"))
@@ -40,6 +42,7 @@
     <label for="dob">Date of birth</label>
     <input id="dob"
            type="date"
+           value="${patient.getBirthday() == null ? "" : patient.getBirthday().toString()}"
            name="birthday"
     >
     @if(result != null && result.hasFieldErrors("birthday"))
@@ -59,13 +62,16 @@
     <input id="address"
            type="text"
            name="address"
+           value="${patient.getAddress()}"
     >
     <label for="phoneNumber">Phone Number</label>
     <input id="phoneNumber"
            type="text"
            name="phoneNumber"
+           value="${patient.getPhoneNumber()}"
     >
     <button type="submit">Save</button>
 </form>
+
 </body>
 </html>

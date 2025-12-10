@@ -1,4 +1,4 @@
-@import com.medilabo.patient.models.Patient
+@import com.medilabo.patient_service_front.models.Patient
 @import java.util.List
 @param List<Patient> patientList
 @param String successMessage
