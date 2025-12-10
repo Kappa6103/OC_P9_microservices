@@ -25,7 +25,7 @@ public class PatientController {
     @GetMapping("patient/list")
     public String patientList(Model model) {
         ResponseEntity<List<Patient>> response = restTemplate.exchange(
-                "http://localhost:8080/patient/list",
+                "http://patient-service-back/patient/list",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {});
@@ -38,7 +38,7 @@ public class PatientController {
     @GetMapping("patient/update/{id}")
     public String showUpdateForm(@PathVariable int id, Model model) {
         Patient patient = restTemplate.getForObject(
-                "http://localhost:8080/patient/update/" + id,
+                "http://patient-service-back/patient/update/" + id,
                 Patient.class);
 
         model.addAttribute("patient", patient);
@@ -59,7 +59,7 @@ public class PatientController {
         }
         HttpEntity<Patient> request = new HttpEntity<>(patient);
         ResponseEntity<Patient> response = restTemplate.exchange(
-                "http://localhost:8080/patient/update",
+                "http://patient-service-back/patient/update",
                 HttpMethod.PUT,
                 request,
                 Patient.class
@@ -119,7 +119,7 @@ public class PatientController {
         HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
         System.out.println(request.hasBody());
         ResponseEntity<Patient> response = restTemplate.exchange(
-                "http://localhost:8080/patient/add",
+                "http://patient-service-back/patient/add",
                 HttpMethod.POST,
                 request,
                 Patient.class
@@ -141,7 +141,7 @@ public class PatientController {
     @GetMapping("patient/delete/{id}")
     public String deletePatient(@PathVariable int id, Model model) {
         restTemplate.delete(
-                "http://localhost:8080/patient/delete/" + id
+                "http://patient-service-back/patient/delete/" + id
         );
         return "redirect:/patient/list";
     }
