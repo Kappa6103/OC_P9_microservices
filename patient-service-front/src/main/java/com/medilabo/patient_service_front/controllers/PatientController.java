@@ -1,8 +1,6 @@
 package com.medilabo.patient_service_front.controllers;
 
 import com.medilabo.patient_service_front.models.Patient;
-import com.netflix.appinfo.InstanceInfo;
-import com.netflix.discovery.EurekaClient;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -21,21 +19,15 @@ import java.util.List;
 @Controller
 public class PatientController {
 
+    private static final String URL_GATEWAY = "http://localhost:8081";
+
     @Autowired
     RestTemplate restTemplate;
-
-    @Autowired
-    private EurekaClient discoveryClient;
-
-    public String gatewayUrl() {
-        InstanceInfo instance = discoveryClient.getNextServerFromEureka("api-gateway-reactive", false);
-        return instance.getHomePageUrl();
-    }
 
     @GetMapping("patient/list")
     public String patientList(Model model) {
         ResponseEntity<List<Patient>> response = restTemplate.exchange(
-                "http://patient-service-back/patient/list",
+                URL_GATEWAY + "/patient/list",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {});
@@ -48,7 +40,7 @@ public class PatientController {
     @GetMapping("patient/update/{id}")
     public String showUpdateForm(@PathVariable int id, Model model) {
         Patient patient = restTemplate.getForObject(
-                "http://patient-service-back/patient/update/" + id,
+                URL_GATEWAY+ "/patient/update/" + id,
                 Patient.class);
 
         model.addAttribute("patient", patient);
@@ -69,32 +61,16 @@ public class PatientController {
         }
         HttpEntity<Patient> request = new HttpEntity<>(patient);
         ResponseEntity<Patient> response = restTemplate.exchange(
-                "http://patient-service-back/patient/update",
+                URL_GATEWAY + "/patient/update",
                 HttpMethod.PUT,
                 request,
                 Patient.class
         );
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//        HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
-//        ResponseEntity<Patient> response = restTemplate.exchange(
-//                "http://localhost:8080/patient/update",
-//                HttpMethod.POST,
-//                request,
-//                Patient.class
-//        );
-
-
-//        ResponseEntity<Patient> response = restTemplate.postForEntity(
-//                "http://localhost:8080/patient/update",
-//                patient,
-//                Patient.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             redirectAttributes.addFlashAttribute("successMessage", "Patient updated !");
-            return "redirect:" + gatewayUrl() + "patient/list";
+            return "redirect:" + URL_GATEWAY + "patient/list";
         } else {
             //TODO ADD AN ERROR MESSAGE TO THE VIEW
             model.addAttribute("patient", patient);
@@ -129,7 +105,7 @@ public class PatientController {
         HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
         System.out.println(request.hasBody());
         ResponseEntity<Patient> response = restTemplate.exchange(
-                "http://patient-service-back/patient/add",
+                URL_GATEWAY + "/patient/add",
                 HttpMethod.POST,
                 request,
                 Patient.class
@@ -137,7 +113,7 @@ public class PatientController {
 
         if (response.getStatusCode().is2xxSuccessful()) {
             redirectAttributes.addFlashAttribute("successMessage", "Patient created !");
-            return "redirect:" + gatewayUrl() + "patient/list";
+            return "redirect:" + URL_GATEWAY + "patient/list";
         } else {
             //TODO error message to display
             model.addAttribute("patient", patient);
@@ -153,7 +129,7 @@ public class PatientController {
         restTemplate.delete(
                 "http://patient-service-back/patient/delete/" + id
         );
-        return "redirect:" + gatewayUrl() + "patient/list";
+        return "redirect:" + URL_GATEWAY + "patient/list";
     }
 
 
