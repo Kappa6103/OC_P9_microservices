@@ -2,6 +2,7 @@
 @import org.springframework.validation.BindingResult
 @param Patient patient
 @param BindingResult result
+@param String errorMessage
 
 <!doctype html>
 <html lang="en">
@@ -14,57 +15,62 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+<h1>Page de creation</h1>
 <a href="/patient/list">
     <h1>retour a la liste</h1>
 </a>
-    <h1>Page de creation</h1>
-<form action="/patient/add" method="post">
-    <label for="fname">First name</label>
-    <input id="fname"
-           type="text"
-           name="firstName"
-    >
-    @if(result != null && result.hasFieldErrors("firstName"))
-        <p>${result.getFieldError("firstName").getDefaultMessage()}</p>
-    @endif
+@if(errorMessage != null && !errorMessage.isBlank())
+    <p>${errorMessage}</p>
+@endif
+@if(patient != null)
+    <form action="/patient/add" method="post">
+        <label for="fname">First name</label>
+        <input id="fname"
+               type="text"
+               name="firstName"
+        >
+        @if(result != null && result.hasFieldErrors("firstName"))
+            <p>${result.getFieldError("firstName").getDefaultMessage()}</p>
+        @endif
 
-    <label for="lname">Last name</label>
-    <input id="lname"
-           type="text"
-           name="lastName"
-    >
-    @if(result != null && result.hasFieldErrors("lastName"))
-        <p>${result.getFieldError("lastName").getDefaultMessage()}</p>
-    @endif
-    <label for="dob">Date of birth</label>
-    <input id="dob"
-           type="date"
-           name="birthday"
-    >
-    @if(result != null && result.hasFieldErrors("birthday"))
-        <p>${result.getFieldError("birthday").getDefaultMessage()}</p>
-    @endif
-    <label for="gender">Gender</label>
-    <select id="gender"
-            name="gender">
-        <option value="${Gender.MALE}">A Dude</option>
-        <option value="${Gender.FEMALE}">A Woman</option>
-        <option value="${Gender.OTHER}">Other</option>
-    </select>
-    @if(result != null && result.hasFieldErrors("gender"))
-        <p>${result.getFieldError("gender").getDefaultMessage()}</p>
-    @endif
-    <label for="address">Address</label>
-    <input id="address"
-           type="text"
-           name="address"
-    >
-    <label for="phoneNumber">Phone Number</label>
-    <input id="phoneNumber"
-           type="text"
-           name="phoneNumber"
-    >
-    <button type="submit">Save</button>
-</form>
+        <label for="lname">Last name</label>
+        <input id="lname"
+               type="text"
+               name="lastName"
+        >
+        @if(result != null && result.hasFieldErrors("lastName"))
+            <p>${result.getFieldError("lastName").getDefaultMessage()}</p>
+        @endif
+        <label for="dob">Date of birth</label>
+        <input id="dob"
+               type="date"
+               name="birthday"
+        >
+        @if(result != null && result.hasFieldErrors("birthday"))
+            <p>${result.getFieldError("birthday").getDefaultMessage()}</p>
+        @endif
+        <label for="gender">Gender</label>
+        <select id="gender"
+                name="gender">
+            <option value="${Gender.MALE}">A Dude</option>
+            <option value="${Gender.FEMALE}">A Woman</option>
+            <option value="${Gender.OTHER}">Other</option>
+        </select>
+        @if(result != null && result.hasFieldErrors("gender"))
+            <p>${result.getFieldError("gender").getDefaultMessage()}</p>
+        @endif
+        <label for="address">Address</label>
+        <input id="address"
+               type="text"
+               name="address"
+        >
+        <label for="phoneNumber">Phone Number</label>
+        <input id="phoneNumber"
+               type="text"
+               name="phoneNumber"
+        >
+        <button type="submit">Save</button>
+    </form>
+@endif
 </body>
 </html>

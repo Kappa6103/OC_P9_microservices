@@ -2,6 +2,7 @@
 @import java.util.List
 @param List<Patient> patientList
 @param String successMessage
+@param String errorMessage
 
 <!doctype html>
 <html lang="en">
@@ -16,7 +17,10 @@
 <body>
 @if(successMessage != null && !successMessage.isBlank())
     <p>${successMessage}</p>
+@elseif(errorMessage != null && !errorMessage.isBlank())
+    <p>${errorMessage}</p>
 @endif
+
 @if(patientList.isEmpty())
     <p>There is no Patients in the system</p>
 @else

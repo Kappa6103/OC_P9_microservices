@@ -78,22 +78,17 @@ public class PatientController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-//    @GetMapping("patient/add")
-//    public String showAddPatient(Model model) {
-//        model.addAttribute("patient", new Patient());
-//        return "patientCreate";
-//    }
 
     @PostMapping("/patient/add")
     public ResponseEntity<Patient> createPatient(
-            @RequestBody Patient patient,
+            @RequestBody @Valid Patient patient,
             BindingResult result
     ) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
-        repo.save(patient);
-        return ResponseEntity.ok().build();
+        Patient saved = repo.save(patient);
+        return ResponseEntity.ok().body(saved);
     }
 
     //TODO confirmer avant delete
