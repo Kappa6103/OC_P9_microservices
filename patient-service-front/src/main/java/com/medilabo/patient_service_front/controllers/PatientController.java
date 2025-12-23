@@ -201,25 +201,23 @@ public class PatientController {
     }
 
     @GetMapping("patient/delete/{id}")
-    public String deletePatient(@PathVariable int id, Model model) {
+    public String deletePatient(@PathVariable int id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            restTemplate.delete(
-                    URL_GATEWAY + "/patient/delete/" + id
-            );
+            restTemplate.delete(URL_GATEWAY + "/patient/delete/" + id);
             log.info("Deleting patient {}", id);
-            model.addAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Patient deleted");
+            redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Patient deleted");
             return "redirect:" + URL_GATEWAY + "patient/list";
         } catch (HttpClientErrorException e) {
             log.error("Client error when deleting patient {} {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());
-            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Client error when deleting");
+            redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Client error when deleting");
             return "redirect:" + URL_GATEWAY + "patient/list";
         } catch (HttpServerErrorException e) {
             log.error("Server error when deleting patient {} {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());
-            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Server error when deleting patient");
+            redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Server error when deleting patient");
             return "redirect:" + URL_GATEWAY + "patient/list";
         } catch (Exception e) {
             log.error("Unexpected error when deleting patient {} {}", id, e.getMessage(), e);
-            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Unexpected error when deleting patient");
+            redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Unexpected error when deleting patient");
             return "redirect:" + URL_GATEWAY + "patient/list";
         }
     }
