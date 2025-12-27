@@ -1,10 +1,10 @@
-package com.medilabo.eureka_server;
+package com.medilabo.note_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EurekaServerApplicationTests {
+class NoteServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
