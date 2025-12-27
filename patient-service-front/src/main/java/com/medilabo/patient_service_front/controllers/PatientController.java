@@ -122,7 +122,7 @@ public class PatientController {
             );
             redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE,
                     String.format("Patient %s %s is updated !", patient.getFirstName(), patient.getLastName()));
-            return "redirect:" + URL_GATEWAY + "patient/list";
+            return "redirect:/patient/list";
         } catch (HttpClientErrorException e) {
             //4xx errors
             log.error("Client error when updating patient {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
@@ -159,6 +159,7 @@ public class PatientController {
         if (result.hasErrors()) {
             model.addAttribute(ATTRIBUTE_PATIENT, patient);
             model.addAttribute(ATTRIBUTE_RESULT, result);
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "input form not valid !");
             return TEMPLATE_PATIENT_CREATE;
         }
         try {
@@ -173,7 +174,7 @@ public class PatientController {
             );
             log.info("Patient created successfully: {}", response.getBody().getId());
             redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Patient created !");
-            return "redirect:" + URL_GATEWAY + "patient/list";
+            return "redirect:/patient/list";
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 log.error("Bad request when creating patient: {}", e.getResponseBodyAsString());
@@ -201,24 +202,24 @@ public class PatientController {
     }
 
     @GetMapping("patient/delete/{id}")
-    public String deletePatient(@PathVariable int id, Model model, RedirectAttributes redirectAttributes) {
+    public String deletePatient(@PathVariable int id, RedirectAttributes redirectAttributes) {
         try {
             restTemplate.delete(URL_GATEWAY + "/patient/delete/" + id);
             log.info("Deleting patient {}", id);
             redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Patient deleted");
-            return "redirect:" + URL_GATEWAY + "patient/list";
+            return "redirect:/patient/list";
         } catch (HttpClientErrorException e) {
             log.error("Client error when deleting patient {} {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());
             redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Client error when deleting");
-            return "redirect:" + URL_GATEWAY + "patient/list";
+            return "redirect:/patient/list";
         } catch (HttpServerErrorException e) {
             log.error("Server error when deleting patient {} {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());
             redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Server error when deleting patient");
-            return "redirect:" + URL_GATEWAY + "patient/list";
+            return "redirect:/patient/list";
         } catch (Exception e) {
             log.error("Unexpected error when deleting patient {} {}", id, e.getMessage(), e);
             redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Unexpected error when deleting patient");
-            return "redirect:" + URL_GATEWAY + "patient/list";
+            return "redirect:/patient/list";
         }
     }
 }
