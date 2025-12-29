@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface NoteRepository extends MongoRepository<DoctorNote, Integer> {
-    List<DoctorNote> findBypatientId(Integer id);
+public interface NoteRepository extends MongoRepository<DoctorNote, String> {
+    List<DoctorNote> findByPatientId(Integer id);
 }

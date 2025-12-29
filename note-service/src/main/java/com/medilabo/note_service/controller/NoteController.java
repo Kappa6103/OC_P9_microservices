@@ -2,42 +2,116 @@ package com.medilabo.note_service.controller;
 
 import com.medilabo.note_service.model.DoctorNote;
 import com.medilabo.note_service.repository.NoteRepository;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
 @RestController
 public class NoteController {
+
     @Autowired
     private NoteRepository repo;
 
     @PostMapping("/addNote")
-    public String saveNote(@RequestBody DoctorNote note) {
-        final var savedNote = repo.save(note);
-        return "Added note with id : " + savedNote.getPatientId();
+    public ResponseEntity<DoctorNote> saveNote(
+            @RequestBody @Valid DoctorNote note,
+            BindingResult result
+    ) {
+        if (result.hasErrors()) {
+            log.error("DoctorNote not valid");
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            DoctorNote savedNote = repo.save(note);
+            log.info("Added note with patientId : {}", savedNote.getPatientId());
+            log.info("Added note with id: {}", savedNote.getId());
+            return ResponseEntity.ok(savedNote);
+        } catch (DataAccessException e) {
+            log.error("Error with the database when saving note {}", note.getPatientId());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Unexpected error when saving note {}", note.getPatientId());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/addNote")
+    public ResponseEntity<DoctorNote> updateNote(
+            @RequestBody @Valid DoctorNote note,
+            BindingResult result
+    ) {
+        if (result.hasErrors()) {
+            log.error("DoctorNote not valid");
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            DoctorNote existingNote = repo.findById(note.getId()).get();
+            existingNote.setNote(note.getNote());
+            DoctorNote savedNote = repo.save(existingNote);
+            log.info("Updated note with patientId : {}", savedNote.getPatientId());
+            log.info("Updated note with id: {}", savedNote.getId());
+            return ResponseEntity.ok(savedNote);
+        } catch (DataAccessException e) {
+            log.error("Error with the database when updating note {}", note.getPatientId());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Unexpected error when updating note {}", note.getPatientId());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/findAllNotes")
-    public List<DoctorNote> getNotes() {
-        return repo.findAll();
+    public ResponseEntity<List<DoctorNote>> getNotes() {
+        try {
+            List<DoctorNote> noteList = repo.findAll();
+            log.info("Returning a note list of {} items", noteList.size());
+            return ResponseEntity.ok(noteList);
+        } catch (DataAccessException e) {
+            log.error("Database error when fetching all notes from the database");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Unexpected error when when fetching all notes");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @GetMapping("/findAllNotes/{id}")
-    public List<DoctorNote> getNotesById(@PathVariable int id) {
-        return repo.findBypatientId(id);
-    }
-
-    @GetMapping("/findBook/{id}")
-    public Optional<DoctorNote> getNote(@PathVariable int id) {
-        return repo.findById(id);
+    @GetMapping("/findNotesById/{id}")
+    public ResponseEntity<List<DoctorNote>> getNotesById(@PathVariable int id) {
+        try {
+            List<DoctorNote> noteList = repo.findByPatientId(id);
+            log.info("returning a list of {} item(s) belonging to patient {}",
+                    noteList.size(), id);
+            return ResponseEntity.ok(noteList);
+        } catch (DataAccessException e) {
+            log.error("Error with the database when fetching notes for patients {}", id);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Unexpected error when fetching notes for patients {}", id);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @DeleteMapping("/delete/{id}")
-    public String deleteNote(@PathVariable int id) {
-        repo.deleteById(id);
-        return "Note deleted with id: " + id;
+    public ResponseEntity<Void> deleteNote(@PathVariable String id) {
+        try {
+            repo.deleteById(id);
+            log.info("Note deleted with id: {}", id);
+            return ResponseEntity.noContent().build();
+        } catch (DataAccessException e) {
+            log.error("Error with the database when deleting note {}", id);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Unexpected error when deleting note {}", id);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }
