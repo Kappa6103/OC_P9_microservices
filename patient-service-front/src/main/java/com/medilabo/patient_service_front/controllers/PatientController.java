@@ -1,6 +1,8 @@
 package com.medilabo.patient_service_front.controllers;
 
+import com.medilabo.patient_service_front.models.DoctorNote;
 import com.medilabo.patient_service_front.models.Patient;
+import com.medilabo.patient_service_front.service.PatientService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +41,30 @@ public class PatientController {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    PatientService service;
+
     @GetMapping("patient/list")
     public String patientList(Model model) {
         try {
-            ResponseEntity<List<Patient>> response = restTemplate.exchange(
+            ResponseEntity<List<Patient>> responsePatient = restTemplate.exchange(
                     URL_GATEWAY + "/patient/list",
                     HttpMethod.GET,
                     null,
-                    new ParameterizedTypeReference<>() {});
-            final List<Patient> patientList = response.getBody();
+                    new ParameterizedTypeReference<>() {}
+            );
+            final List<Patient> patientList = responsePatient.getBody();
+
+            ResponseEntity<List<DoctorNote>> responseNote = restTemplate.exchange(
+                    URL_GATEWAY + "/notes",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
+            );
+            final List<DoctorNote> doctorNoteList = responseNote.getBody();
+
+            service.patientAndNoteJoiner(patientList, doctorNoteList);
+
             model.addAttribute(ATTRIBUTE_PATIENT_LIST, patientList);
             log.info("Fetching list of {} patients", patientList.size());
             return TEMPLATE_PATIENT_LIST;

@@ -20,7 +20,7 @@ public class NoteController {
     @Autowired
     private NoteRepository repo;
 
-    @PostMapping("/addNote")
+    @PostMapping("/note")
     public ResponseEntity<DoctorNote> saveNote(
             @RequestBody @Valid DoctorNote note,
             BindingResult result
@@ -43,7 +43,7 @@ public class NoteController {
         }
     }
 
-    @PutMapping("/addNote")
+    @PutMapping("/note")
     public ResponseEntity<DoctorNote> updateNote(
             @RequestBody @Valid DoctorNote note,
             BindingResult result
@@ -68,7 +68,7 @@ public class NoteController {
         }
     }
 
-    @GetMapping("/findAllNotes")
+    @GetMapping("/notes")
     public ResponseEntity<List<DoctorNote>> getNotes() {
         try {
             List<DoctorNote> noteList = repo.findAll();
@@ -83,8 +83,8 @@ public class NoteController {
         }
     }
 
-    @GetMapping("/findNotesById/{id}")
-    public ResponseEntity<List<DoctorNote>> getNotesById(@PathVariable int id) {
+    @GetMapping("/notes/patient/{id}")
+    public ResponseEntity<List<DoctorNote>> getNotesByPatientId(@PathVariable int id) {
         try {
             List<DoctorNote> noteList = repo.findByPatientId(id);
             log.info("returning a list of {} item(s) belonging to patient {}",
@@ -99,7 +99,7 @@ public class NoteController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/note/{id}")
     public ResponseEntity<Void> deleteNote(@PathVariable String id) {
         try {
             repo.deleteById(id);
