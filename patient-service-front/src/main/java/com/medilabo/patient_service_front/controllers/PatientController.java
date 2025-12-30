@@ -29,12 +29,14 @@ public class PatientController {
     private static final String TEMPLATE_PATIENT_LIST = "patientList";
     private static final String TEMPLATE_PATIENT_CREATE = "patientCreate";
     private static final String TEMPLATE_PATIENT_UPDATE = "patientUpdate";
+    private static final String TEMPLATE_NOTE_CREATE = "patientNote";
 
     private static final String ATTRIBUTE_PATIENT_LIST = "patientList";
     private static final String ATTRIBUTE_PATIENT = "patient";
     private static final String ATTRIBUTE_RESULT = "result";
     private static final String ATTRIBUTE_ERROR_MESSAGE = "errorMessage";
     private static final String ATTRIBUTE_SUCCESS_MESSAGE = "successMessage";
+    private static final String ATTRIBUTE_DOCTOR_NOTE = "doctorNote";
 
     private static final String URL_GATEWAY = "http://localhost:8081";
 
@@ -43,6 +45,50 @@ public class PatientController {
 
     @Autowired
     PatientService service;
+
+    @GetMapping("/patient/addNote/{id}")
+    public String addNote(@PathVariable int id, Model model) {
+        try {
+            DoctorNote doctorNote = new DoctorNote();
+            doctorNote.setPatientId(id);
+            model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
+            return "patientNote";
+        } catch (Exception e) {
+            log.error("Exception when fetching patient {}", e.getMessage());
+            return TEMPLATE_NOTE_CREATE;
+        }
+    }
+
+    @PostMapping("/patient/addNote")
+    public String saveNote(@Valid DoctorNote doctorNote, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
+            model.addAttribute(ATTRIBUTE_RESULT, result);
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "input form not valid !");
+            return TEMPLATE_NOTE_CREATE;
+        }
+        model.addAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Note Created !");
+        try {
+            HttpEntity<DoctorNote> request = new HttpEntity<>(doctorNote);
+            ResponseEntity<DoctorNote> response = restTemplate.exchange(
+                    URL_GATEWAY + "/note",
+                    HttpMethod.POST,
+                    request,
+                    DoctorNote.class
+            );
+            if (response.getBody() == null || response.getBody().getId() == null) {
+                log.error("Failed to save note: Response body or ID is null");
+                model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Technical error: Note was not saved correctly.");
+                return TEMPLATE_NOTE_CREATE;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        doctorNote.setNote("");
+        model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
+        return TEMPLATE_NOTE_CREATE;
+    }
 
     @GetMapping("patient/list")
     public String patientList(Model model) {
@@ -56,12 +102,13 @@ public class PatientController {
             final List<Patient> patientList = responsePatient.getBody();
 
             ResponseEntity<List<DoctorNote>> responseNote = restTemplate.exchange(
-                    URL_GATEWAY + "/notes",
+                    URL_GATEWAY + "/note/list",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<>() {}
             );
             final List<DoctorNote> doctorNoteList = responseNote.getBody();
+            log.info("doctorList has a body : {}", responseNote.hasBody());
 
             service.patientAndNoteJoiner(patientList, doctorNoteList);
 
@@ -224,6 +271,7 @@ public class PatientController {
             restTemplate.delete(URL_GATEWAY + "/patient/delete/" + id);
             log.info("Deleting patient {}", id);
             redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Patient deleted");
+            restTemplate.delete(URL_GATEWAY + "/note/patient/" + id);
             return "redirect:/patient/list";
         } catch (HttpClientErrorException e) {
             log.error("Client error when deleting patient {} {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());

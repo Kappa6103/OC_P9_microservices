@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -33,6 +34,9 @@ public class Patient {
 
     private String address;
     private String phoneNumber;
+
+    @Transient
+    private List<DoctorNote> noteList;
 
     public Patient(String firstName, String lastName, LocalDate birthday, Gender gender, String address, String phoneNumber) {
         this.firstName = firstName;

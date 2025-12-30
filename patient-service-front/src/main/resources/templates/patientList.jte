@@ -1,3 +1,4 @@
+@import com.medilabo.patient_service_front.models.DoctorNote
 @import com.medilabo.patient_service_front.models.Patient
 @import java.util.List
 @param List<Patient> patientList
@@ -32,6 +33,7 @@
             <th>Gender</th>
             <th>address</th>
             <th>Phone number</th>
+            <th>Note</th>
             <th>Action</th>
         </tr>
         @for(var patient : patientList)
@@ -43,11 +45,19 @@
                 <td>${patient.getAddress()}</td>
                 <td>${patient.getPhoneNumber()}</td>
                 <td>
+                    @for(DoctorNote note : patient.getNoteList())
+                        <p>${note.getNote()}</p>
+                    @endfor
+                </td>
+                <td>
                     <form action="/patient/update/${patient.getId()}" method="get" style="display: inline;">
                         <button type="submit">Edit</button>
                     </form>
                     <form action="/patient/delete/${patient.getId()}" method="get" style="display: inline;">
                         <button type="submit" class="link-button">Delete</button>
+                    </form>
+                    <form action="/patient/addNote/${patient.getId()}" method="get" style="display: inline;">
+                        <button type="submit" class="link-button">Add note</button>
                     </form>
                 </td>
 

@@ -1,9 +1,8 @@
-package com.medilabo.patient_service_front.models;
+package com.medilabo.patient.models;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter

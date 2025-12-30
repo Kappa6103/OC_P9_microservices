@@ -68,7 +68,7 @@ public class NoteController {
         }
     }
 
-    @GetMapping("/notes")
+    @GetMapping("/note/list")
     public ResponseEntity<List<DoctorNote>> getNotes() {
         try {
             List<DoctorNote> noteList = repo.findAll();
@@ -110,6 +110,21 @@ public class NoteController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
             log.error("Unexpected error when deleting note {}", id);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/note/patient/{id}")
+    public ResponseEntity<Void> deletePatientNote(@PathVariable int id) {
+        try {
+            repo.deleteAllByPatientId(id);
+            log.info("Notes deleted with patientId: {}", id);
+            return ResponseEntity.noContent().build();
+        } catch (DataAccessException e) {
+            log.error("Error with the database when deleting notes {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("Unexpected error when deleting notes {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
