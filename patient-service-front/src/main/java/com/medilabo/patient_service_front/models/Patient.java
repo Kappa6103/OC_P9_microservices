@@ -33,6 +33,8 @@ public class Patient {
 
     private List<DoctorNote> noteList;
 
+    private Risk risk;
+
     public Patient(String firstName, String lastName, LocalDate birthday, Gender gender, String address, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;

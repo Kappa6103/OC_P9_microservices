@@ -1,7 +1,9 @@
 package com.medilabo.patient_service_front.controllers;
 
+import com.medilabo.patient_service_front.models.AssessmentRequest;
 import com.medilabo.patient_service_front.models.DoctorNote;
 import com.medilabo.patient_service_front.models.Patient;
+import com.medilabo.patient_service_front.service.NoteService;
 import com.medilabo.patient_service_front.service.PatientService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +46,10 @@ public class PatientController {
     RestTemplate restTemplate;
 
     @Autowired
-    PatientService service;
+    PatientService patientService;
+
+    @Autowired
+    NoteService noteService;
 
     @GetMapping("/patient/addNote/{id}")
     public String addNote(@PathVariable int id, Model model) {
@@ -82,7 +87,21 @@ public class PatientController {
                 return TEMPLATE_NOTE_CREATE;
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("error when posting the note {}", doctorNote.getNote());
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Technical error: Note was not saved correctly.");
+            return TEMPLATE_NOTE_CREATE;
+        }
+        AssessmentRequest assessmentRequest = new AssessmentRequest(doctorNote.getPatientId(), doctorNote.getId());
+        try {
+            HttpEntity<AssessmentRequest> request = new HttpEntity<>(assessmentRequest);
+            ResponseEntity<AssessmentRequest> response = restTemplate.exchange(
+                    URL_GATEWAY + "/risk",
+                    HttpMethod.POST,
+                    request,
+                    AssessmentRequest.class
+            );
+        } catch (Exception e) {
+            log.error("fail to send assessment request");
         }
 
         doctorNote.setNote("");
@@ -110,7 +129,7 @@ public class PatientController {
             final List<DoctorNote> doctorNoteList = responseNote.getBody();
             log.info("doctorList has a body : {}", responseNote.hasBody());
 
-            service.patientAndNoteJoiner(patientList, doctorNoteList);
+            patientService.patientAndNoteJoiner(patientList, doctorNoteList);
 
             model.addAttribute(ATTRIBUTE_PATIENT_LIST, patientList);
             log.info("Fetching list of {} patients", patientList.size());
