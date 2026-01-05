@@ -1,6 +1,6 @@
-package com.medilabo.patient.models;
+package com.medilabo.risk_assessment.model;
 
-import jakarta.persistence.*;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -10,14 +10,11 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.List;
 
-@NoArgsConstructor
 @Getter
 @Setter
-@Entity
+@NoArgsConstructor
 public class Patient {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotBlank
@@ -35,7 +32,6 @@ public class Patient {
     private String address;
     private String phoneNumber;
 
-    @Transient
     private List<DoctorNote> noteList;
 
     private Risk risk;
@@ -61,3 +57,5 @@ public class Patient {
     }
 
 }
+
+

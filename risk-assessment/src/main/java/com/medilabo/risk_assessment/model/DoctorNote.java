@@ -1,4 +1,4 @@
-package com.medilabo.patient_service_front.models;
+package com.medilabo.risk_assessment.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,4 +16,6 @@ public class DoctorNote {
 
     @NotBlank
     private String note;
+
+    private Integer triggerWords;
 }
