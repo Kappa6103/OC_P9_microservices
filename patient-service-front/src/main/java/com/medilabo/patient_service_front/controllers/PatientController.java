@@ -1,6 +1,5 @@
 package com.medilabo.patient_service_front.controllers;
 
-import com.medilabo.patient_service_front.models.AssessmentRequest;
 import com.medilabo.patient_service_front.models.DoctorNote;
 import com.medilabo.patient_service_front.models.Patient;
 import com.medilabo.patient_service_front.service.NoteService;
@@ -91,14 +90,14 @@ public class PatientController {
             model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Technical error: Note was not saved correctly.");
             return TEMPLATE_NOTE_CREATE;
         }
-        AssessmentRequest assessmentRequest = new AssessmentRequest(doctorNote.getPatientId(), doctorNote.getId());
+
         try {
-            HttpEntity<AssessmentRequest> request = new HttpEntity<>(assessmentRequest);
-            ResponseEntity<AssessmentRequest> response = restTemplate.exchange(
+            HttpEntity<Integer> request = new HttpEntity<>(doctorNote.getPatientId());
+            restTemplate.exchange(
                     URL_GATEWAY + "/risk",
                     HttpMethod.POST,
                     request,
-                    AssessmentRequest.class
+                    Void.class
             );
         } catch (Exception e) {
             log.error("fail to send assessment request");

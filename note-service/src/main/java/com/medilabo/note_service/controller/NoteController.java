@@ -83,18 +83,18 @@ public class NoteController {
         }
     }
 
-    @GetMapping("/notes/patient/{id}")
-    public ResponseEntity<List<DoctorNote>> getNotesByPatientId(@PathVariable int id) {
+    @GetMapping("/notes/patient/{patientId}")
+    public ResponseEntity<List<DoctorNote>> getNotesByPatientId(@PathVariable int patientId) {
         try {
-            List<DoctorNote> noteList = repo.findByPatientId(id);
+            List<DoctorNote> noteList = repo.findByPatientId(patientId);
             log.info("returning a list of {} item(s) belonging to patient {}",
-                    noteList.size(), id);
+                    noteList.size(), patientId);
             return ResponseEntity.ok(noteList);
         } catch (DataAccessException e) {
-            log.error("Error with the database when fetching notes for patients {}", id);
+            log.error("Error with the database when fetching notes for patients {}", patientId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
-            log.error("Unexpected error when fetching notes for patients {}", id);
+            log.error("Unexpected error when fetching notes for patients {}", patientId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

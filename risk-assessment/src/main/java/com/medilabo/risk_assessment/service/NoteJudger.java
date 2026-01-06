@@ -2,10 +2,12 @@ package com.medilabo.risk_assessment.service;
 
 import java.util.List;
 
-public class NoteJudger {
+class NoteJudger {
+
     private final String note;
     private String[] tokenisedNote;
     private int score = 0;
+
     private final List<String> listOfTriggers = List.of(
             "Hémoglobine A1C", "hémoglobine A1C",
             "Microalbumine", "microalbumine",
@@ -20,23 +22,24 @@ public class NoteJudger {
     );
 
     public NoteJudger(String note) {
+        if (note == null || note.isBlank()) {
+            throw new IllegalArgumentException("Note was null or blank");
+        }
         this.note = note;
     }
 
     public int getScore() {
-
         stringTokeniser();
-
-        for (var string : tokenisedNote) {
+        for (String string : tokenisedNote) {
             if (listOfTriggers.contains(string)) {
                 score++;
             }
         }
-
         return score;
     }
 
     private void stringTokeniser() {
         tokenisedNote = note.split("[\\s,.;:!?]+");
     }
+
 }

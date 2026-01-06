@@ -10,9 +10,10 @@ import java.time.Period;
 import java.util.List;
 
 public class RiskJudger {
+
     private Risk risk;
-    private Patient patient;
-    private List<DoctorNote> allExistingNotes;
+    private final Patient patient;
+    private final List<DoctorNote> allExistingNotes;
     private int triggerWordsTotal = 0;
     private int age = 0;
 
@@ -77,7 +78,7 @@ public class RiskJudger {
 
     private void addAllTriggerWord() {
         for (DoctorNote doctorNote : allExistingNotes) {
-            triggerWordsTotal += doctorNote.getTriggerWords();
+            triggerWordsTotal += doctorNote.getTriggerWordsCount();
         }
     }
 

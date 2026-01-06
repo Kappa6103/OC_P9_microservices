@@ -17,5 +17,6 @@ public class DoctorNote {
     @NotBlank
     private String note;
 
-    private Integer triggerWords;
+
+    private Integer triggerWordsCount;
 }

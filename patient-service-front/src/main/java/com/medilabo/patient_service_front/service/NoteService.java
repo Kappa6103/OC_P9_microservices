@@ -1,6 +1,5 @@
 package com.medilabo.patient_service_front.service;
 
-import com.medilabo.patient_service_front.models.AssessmentRequest;
 import com.medilabo.patient_service_front.models.DoctorNote;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ public class NoteService {
     @Autowired
     RestTemplate restTemplate;
 
-    public void sendRequest(AssessmentRequest assessmentRequest) {
+    public void sendRequest() {
 
 
     }

@@ -1,12 +1,13 @@
 package com.medilabo.risk_assessment.service;
 
-import com.medilabo.risk_assessment.model.AssessmentRequest;
+import com.medilabo.risk_assessment.client.DoctorNoteClient;
+import com.medilabo.risk_assessment.client.PatientClient;
 import com.medilabo.risk_assessment.model.DoctorNote;
 import com.medilabo.risk_assessment.model.Patient;
 import com.medilabo.risk_assessment.model.Risk;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -14,33 +15,33 @@ import java.util.List;
 @Service
 public class RiskAssessmentService {
 
-//    @Bean
-//    public RestTemplate getRestTemplate(RestTemplateBuilder builder) {
-//        return builder
-//                .connectTimeout(Duration.ofSeconds(3))
-//                .readTimeout(Duration.ofSeconds(3))
-//                .build();
-//    }
+    @Autowired
+    DoctorNoteClient noteClient;
 
-    RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    PatientClient patientClient;
 
-    public void processRequest(AssessmentRequest assessmentRequest) {
-        Patient patient = getPatient(assessmentRequest.patientId());
-        // DoctorNote newNote = getDoctorNote(assessmentRequest.noteId());
-        List<DoctorNote> allExistingNotes = getAllNotesForPatient(assessmentRequest.patientId());
 
-        calculateTriggerWordsCount(allExistingNotes);
+    public void assessPatient(Integer patientId) {
 
-        RiskJudger riskJudger = new RiskJudger(patient, allExistingNotes);
+        Patient patient = patientClient.getPatientById(patientId);
+        List<DoctorNote> allExistingNotes = noteClient.getAllNotesByPatientId(patientId);
 
-        patient.setRisk(riskJudger.assessPatient());
+        if (allExistingNotes.isEmpty()) {
+            patient.setRisk(Risk.NONE);
+        } else {
+            calculateTriggerWordsCount(allExistingNotes);
+            RiskJudger riskJudger = getRiskJudger(patient, allExistingNotes);
+            patient.setRisk(riskJudger.assessPatient());
+        }
 
     }
 
+    //TODO boolean flag in the note model to know if the triggerWordsCount is necessary ?
     private void calculateTriggerWordsCount(List<DoctorNote> allExistingNotes) {
         for(DoctorNote doctorNote : allExistingNotes) {
             NoteJudger noteJudger = getNoteJudger(doctorNote.getNote());
-            doctorNote.setTriggerWords(noteJudger.getScore());
+            doctorNote.setTriggerWordsCount(noteJudger.getScore());
         }
     }
 
@@ -48,16 +49,8 @@ public class RiskAssessmentService {
         return new NoteJudger(note);
     }
 
-    private List<DoctorNote> getAllNotesForPatient(int patientId) {
-
-    }
-
-    private Patient getPatient(int patientId) {
-
-    }
-
-    private DoctorNote getDoctorNote(String noteId) {
-
+    private RiskJudger getRiskJudger(Patient patient, List<DoctorNote> allExistingNotes) {
+        return new RiskJudger(patient, allExistingNotes);
     }
 
 }

@@ -37,20 +37,20 @@ public class PatientController {
         }
     }
 
-    @GetMapping("patient/update/{id}")
-    public ResponseEntity<Patient> showUpdateForm(@PathVariable int id) {
+    @GetMapping("patient/{patientId}")
+    public ResponseEntity<Patient> getPatient(@PathVariable int patientId) {
         try {
-            Optional<Patient> optionalPatient = repo.findById(id);
+            Optional<Patient> optionalPatient = repo.findById(patientId);
             if (optionalPatient.isEmpty()) {
-                log.error("Patient didn't exist for id: {}", id);
+                log.error("Patient didn't exist for patientId: {}", patientId);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
             return ResponseEntity.ok(optionalPatient.get());
         } catch (DataAccessException e) {
-            log.error("Error with the database when fetching patient {}", id);
+            log.error("Error with the database when fetching patient {}", patientId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
-            log.error("Unexpected error when fetching patient {}", id);
+            log.error("Unexpected error when fetching patient {}", patientId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
