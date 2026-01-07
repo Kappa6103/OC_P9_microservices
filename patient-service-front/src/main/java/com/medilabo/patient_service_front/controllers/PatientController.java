@@ -92,12 +92,11 @@ public class PatientController {
         }
 
         try {
-            HttpEntity<Integer> request = new HttpEntity<>(doctorNote.getPatientId());
-            restTemplate.exchange(
-                    URL_GATEWAY + "/risk",
-                    HttpMethod.POST,
-                    request,
-                    Void.class
+            restTemplate.postForEntity(
+                    URL_GATEWAY + "/risk/{patientId}",
+                    null,
+                    Void.class,
+                    doctorNote.getPatientId()
             );
         } catch (Exception e) {
             log.error("fail to send assessment request");

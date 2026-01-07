@@ -34,7 +34,7 @@ public class RiskAssessmentService {
             RiskJudger riskJudger = getRiskJudger(patient, allExistingNotes);
             patient.setRisk(riskJudger.assessPatient());
         }
-
+        patientClient.savePatient(patient);
     }
 
     //TODO boolean flag in the note model to know if the triggerWordsCount is necessary ?

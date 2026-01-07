@@ -1,5 +1,6 @@
 package com.medilabo.risk_assessment.service;
 
+import java.text.Normalizer;
 import java.util.List;
 
 class NoteJudger {
@@ -23,10 +24,13 @@ class NoteJudger {
 
     public NoteJudger(String note) {
         if (note == null || note.isBlank()) {
+
             throw new IllegalArgumentException("Note was null or blank");
         }
         this.note = note;
     }
+
+    //TODO reverse the check, contains() on the note while iterating on the triggers. Also putting the note in lowercase.
 
     public int getScore() {
         stringTokeniser();

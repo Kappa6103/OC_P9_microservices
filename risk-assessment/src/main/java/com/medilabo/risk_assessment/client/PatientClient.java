@@ -13,4 +13,12 @@ public class PatientClient extends AbstractClient {
         );
     }
 
+
+    public void savePatient(Patient patient) {
+        restTemplate.postForEntity(
+                gatewayUrl + "/patient/add",
+                patient,
+                Void.class
+        );
+    }
 }
