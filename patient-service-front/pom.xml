@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.medilabo</groupId>
-	<artifactId>patient-service-front</artifactId>
+	<artifactId>web-frontend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>patient-service-front</name>
 	<description>server ui for medilabo patient service</description>

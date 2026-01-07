@@ -1,9 +1,11 @@
 package com.medilabo.patient_service_front.controllers;
 
+import com.medilabo.patient_service_front.client.DoctorNoteClient;
+import com.medilabo.patient_service_front.client.PatientClient;
 import com.medilabo.patient_service_front.models.DoctorNote;
 import com.medilabo.patient_service_front.models.Patient;
 import com.medilabo.patient_service_front.service.NoteService;
-import com.medilabo.patient_service_front.service.PatientService;
+import com.medilabo.patient_service_front.service.Service;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
@@ -25,7 +26,15 @@ import java.util.List;
 
 @Slf4j
 @Controller
-public class PatientController {
+public class WebController {
+
+    @Autowired
+    Service service;
+
+    @Autowired
+    PatientClient patientClient;
+    @Autowired
+    DoctorNoteClient noteClient;
 
     private static final String TEMPLATE_PATIENT_LIST = "patientList";
     private static final String TEMPLATE_PATIENT_CREATE = "patientCreate";
@@ -39,22 +48,42 @@ public class PatientController {
     private static final String ATTRIBUTE_SUCCESS_MESSAGE = "successMessage";
     private static final String ATTRIBUTE_DOCTOR_NOTE = "doctorNote";
 
-    private static final String URL_GATEWAY = "http://localhost:8081";
+    @GetMapping("patient/list")
+    public String patientList(Model model) {
+        try {
+            final List<Patient> patientList = patientClient.getAllPatients();
+            log.info("Fetching list of {} patients", patientList.size());
+            final List<DoctorNote> doctorNoteList = noteClient.getAllNotes();
+            log.info("Fetching list of {} notes", doctorNoteList.size());
+            service.patientAndNoteJoiner(patientList, doctorNoteList);
+            model.addAttribute(ATTRIBUTE_PATIENT_LIST, patientList);
+            return TEMPLATE_PATIENT_LIST;
+        } catch (HttpClientErrorException e) {
+            // 4xx errors
+            log.error("Client error when fetching patients: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Client error. Unable to load patients.");
+            model.addAttribute(ATTRIBUTE_PATIENT_LIST, Collections.emptyList());
+            return TEMPLATE_PATIENT_LIST;
+        } catch (HttpServerErrorException e) {
+            //5xx errors
+            log.error("Server error when fetching patients: {} {}", e.getStatusCode(), e.getResponseBodyAsString());
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Server error. Unable to load patients.");
+            model.addAttribute(ATTRIBUTE_PATIENT_LIST, Collections.emptyList());
+            return TEMPLATE_PATIENT_LIST;
+        } catch (Exception e) {
+            log.error("Unexpected error when fetching patients: {}", e.getMessage(), e);
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "An unexpected error occurred.");
+            model.addAttribute(ATTRIBUTE_PATIENT_LIST, Collections.emptyList());
+            return TEMPLATE_PATIENT_LIST;
+        }
+    }
 
-    @Autowired
-    RestTemplate restTemplate;
-
-    @Autowired
-    PatientService patientService;
-
-    @Autowired
-    NoteService noteService;
-
-    @GetMapping("/patient/addNote/{id}")
-    public String addNote(@PathVariable int id, Model model) {
+    //previous url : "/patient/addNote/{id}"
+    @GetMapping("/patient/{patientId}/addNote")
+    public String addNote(@PathVariable int patientId, Model model) {
         try {
             DoctorNote doctorNote = new DoctorNote();
-            doctorNote.setPatientId(id);
+            doctorNote.setPatientId(patientId);
             model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
             return "patientNote";
         } catch (Exception e) {
@@ -107,50 +136,7 @@ public class PatientController {
         return TEMPLATE_NOTE_CREATE;
     }
 
-    @GetMapping("patient/list")
-    public String patientList(Model model) {
-        try {
-            ResponseEntity<List<Patient>> responsePatient = restTemplate.exchange(
-                    URL_GATEWAY + "/patient/list",
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<>() {}
-            );
-            final List<Patient> patientList = responsePatient.getBody();
 
-            ResponseEntity<List<DoctorNote>> responseNote = restTemplate.exchange(
-                    URL_GATEWAY + "/note/list",
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<>() {}
-            );
-            final List<DoctorNote> doctorNoteList = responseNote.getBody();
-            log.info("doctorList has a body : {}", responseNote.hasBody());
-
-            patientService.patientAndNoteJoiner(patientList, doctorNoteList);
-
-            model.addAttribute(ATTRIBUTE_PATIENT_LIST, patientList);
-            log.info("Fetching list of {} patients", patientList.size());
-            return TEMPLATE_PATIENT_LIST;
-        } catch (HttpClientErrorException e) {
-            // 4xx errors
-            log.error("Client error when fetching patients: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
-            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Client error. Unable to load patients.");
-            model.addAttribute(ATTRIBUTE_PATIENT_LIST, Collections.emptyList());
-            return TEMPLATE_PATIENT_LIST;
-        } catch (HttpServerErrorException e) {
-            //5xx errors
-            log.error("Server error when fetching patients: {} {}", e.getStatusCode(), e.getResponseBodyAsString());
-            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Server error. Unable to load patients.");
-            model.addAttribute(ATTRIBUTE_PATIENT_LIST, Collections.emptyList());
-            return TEMPLATE_PATIENT_LIST;
-        } catch (Exception e) {
-            log.error("Unexpected error when fetching patients: {}", e.getMessage(), e);
-            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "An unexpected error occurred.");
-            model.addAttribute(ATTRIBUTE_PATIENT_LIST, Collections.emptyList());
-            return TEMPLATE_PATIENT_LIST;
-        }
-    }
 
     @GetMapping("patient/update/{id}")
     public String showUpdateForm(@PathVariable int id, Model model) {

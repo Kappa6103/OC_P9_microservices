@@ -56,7 +56,7 @@
                     <form action="/patient/delete/${patient.getId()}" method="get" style="display: inline;">
                         <button type="submit" class="link-button">Delete</button>
                     </form>
-                    <form action="/patient/addNote/${patient.getId()}" method="get" style="display: inline;">
+                    <form action="/patient/${patient.getId()}/addNote/" method="get" style="display: inline;">
                         <button type="submit" class="link-button">Add note</button>
                     </form>
                 </td>

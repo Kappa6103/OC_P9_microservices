@@ -3,7 +3,6 @@ package com.medilabo.patient_service_front.service;
 import com.medilabo.patient_service_front.models.DoctorNote;
 import com.medilabo.patient_service_front.models.Patient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Service
-public class PatientService {
+@org.springframework.stereotype.Service
+public class Service {
+
 
     public void patientAndNoteJoiner(List<Patient> patientList, List<DoctorNote> doctorNoteList) {
         if (patientList == null || doctorNoteList == null) {
