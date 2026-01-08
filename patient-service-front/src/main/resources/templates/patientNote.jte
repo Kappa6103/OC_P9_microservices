@@ -28,7 +28,7 @@
     <p>${successMessage}</p>
 @endif
 @if(doctorNote != null)
-    <form action="/patient/addNote" method="post">
+    <form action="/patient/${doctorNote.getPatientId()}/addNote" method="post">
         <input type="hidden" name="patientId" value="${doctorNote.getPatientId()}">
         
         <label for="note">Note</label>

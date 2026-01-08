@@ -7,26 +7,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class PatientClient extends AbstractClient {
 
-    private static final String PATIENT_PATH = "/patients";
+    private static final String PATIENT_ID_PATH = "/patients/{id}";
 
     public Patient getPatientById(Integer patientId) {
         final String url = UriComponentsBuilder
                 .fromUriString(gatewayUrl)
-                .path(PATIENT_PATH)
+                .path(PATIENT_ID_PATH)
                 .buildAndExpand(patientId)
                 .toUriString();
-
         return restTemplate.getForObject(url, Patient.class);
     }
 
-
-    public void savePatient(Patient patient) {
-        final String url = UriComponentsBuilder
-                .fromUriString(gatewayUrl)
-                .path(PATIENT_PATH)
-                .buildAndExpand(patient.getId())
-                .toUriString();
-
-        restTemplate.put(url, patient);
-    }
 }

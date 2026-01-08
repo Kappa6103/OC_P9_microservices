@@ -22,19 +22,18 @@ public class RiskAssessmentService {
     PatientClient patientClient;
 
 
-    public void assessPatient(Integer patientId) {
-
+    public Risk assessPatient(Integer patientId) {
         Patient patient = patientClient.getPatientById(patientId);
         List<DoctorNote> allExistingNotes = noteClient.getAllNotesByPatientId(patientId);
-
+        Risk risk;
         if (allExistingNotes.isEmpty()) {
-            patient.setRisk(Risk.NONE);
+            risk = Risk.NONE;
         } else {
             calculateTriggerWordsCount(allExistingNotes);
             RiskJudger riskJudger = getRiskJudger(patient, allExistingNotes);
-            patient.setRisk(riskJudger.assessPatient());
+            risk = riskJudger.assessPatient();
         }
-        patientClient.savePatient(patient);
+        return risk;
     }
 
     //TODO boolean flag in the note model to know if the triggerWordsCount is necessary ?

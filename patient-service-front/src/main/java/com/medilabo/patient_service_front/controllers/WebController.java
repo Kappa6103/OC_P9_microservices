@@ -2,14 +2,14 @@ package com.medilabo.patient_service_front.controllers;
 
 import com.medilabo.patient_service_front.client.DoctorNoteClient;
 import com.medilabo.patient_service_front.client.PatientClient;
+import com.medilabo.patient_service_front.client.RiskClient;
 import com.medilabo.patient_service_front.models.DoctorNote;
 import com.medilabo.patient_service_front.models.Patient;
-import com.medilabo.patient_service_front.service.NoteService;
+import com.medilabo.patient_service_front.models.Risk;
 import com.medilabo.patient_service_front.service.Service;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,8 +21,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -35,6 +34,8 @@ public class WebController {
     PatientClient patientClient;
     @Autowired
     DoctorNoteClient noteClient;
+    @Autowired
+    RiskClient riskClient;
 
     private static final String TEMPLATE_PATIENT_LIST = "patientList";
     private static final String TEMPLATE_PATIENT_CREATE = "patientCreate";
@@ -48,10 +49,10 @@ public class WebController {
     private static final String ATTRIBUTE_SUCCESS_MESSAGE = "successMessage";
     private static final String ATTRIBUTE_DOCTOR_NOTE = "doctorNote";
 
-    @GetMapping("patient/list")
+    @GetMapping("/patient/list")
     public String patientList(Model model) {
         try {
-            final List<Patient> patientList = patientClient.getAllPatients();
+            final List<Patient> patientList = patientClient.getAll();
             log.info("Fetching list of {} patients", patientList.size());
             final List<DoctorNote> doctorNoteList = noteClient.getAllNotes();
             log.info("Fetching list of {} notes", doctorNoteList.size());
@@ -80,70 +81,52 @@ public class WebController {
 
     //previous url : "/patient/addNote/{id}"
     @GetMapping("/patient/{patientId}/addNote")
-    public String addNote(@PathVariable int patientId, Model model) {
+    public String addNote(@PathVariable Integer patientId, Model model) {
         try {
-            DoctorNote doctorNote = new DoctorNote();
+            final DoctorNote doctorNote = new DoctorNote();
             doctorNote.setPatientId(patientId);
+            log.info("Creating new note with patient id: {}", patientId);
             model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
-            return "patientNote";
+            return TEMPLATE_NOTE_CREATE;
         } catch (Exception e) {
             log.error("Exception when fetching patient {}", e.getMessage());
             return TEMPLATE_NOTE_CREATE;
         }
     }
 
-    @PostMapping("/patient/addNote")
-    public String saveNote(@Valid DoctorNote doctorNote, BindingResult result, Model model) {
-        if (result.hasErrors()) {
+    //previous url : "/patient/addNote"
+    @PostMapping("/patient/{patientId}/addNote")
+    public String saveNote(@PathVariable Integer patientId, @Valid DoctorNote doctorNote, BindingResult result, Model model) {
+        if (result.hasErrors() || !Objects.equals(patientId, doctorNote.getPatientId())) {
+            final String errorMsg = result.hasErrors() ? "input form not valid !" : "input form corrupted";
+            log.error(errorMsg);
             model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
             model.addAttribute(ATTRIBUTE_RESULT, result);
-            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "input form not valid !");
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, errorMsg);
             return TEMPLATE_NOTE_CREATE;
         }
-        model.addAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Note Created !");
         try {
-            HttpEntity<DoctorNote> request = new HttpEntity<>(doctorNote);
-            ResponseEntity<DoctorNote> response = restTemplate.exchange(
-                    URL_GATEWAY + "/note",
-                    HttpMethod.POST,
-                    request,
-                    DoctorNote.class
-            );
-            if (response.getBody() == null || response.getBody().getId() == null) {
-                log.error("Failed to save note: Response body or ID is null");
-                model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Technical error: Note was not saved correctly.");
-                return TEMPLATE_NOTE_CREATE;
-            }
+            noteClient.saveNote(doctorNote);
+            log.info("note saved");
         } catch (Exception e) {
-            log.error("error when posting the note {}", doctorNote.getNote());
+            final String note = doctorNote.getNote();
+            final String cropped = note.length() > 100 ? note.substring(0, 100) + "..." : note;
+            log.error("error when posting the note [{}]", cropped);
             model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Technical error: Note was not saved correctly.");
             return TEMPLATE_NOTE_CREATE;
         }
-
-        try {
-            restTemplate.postForEntity(
-                    URL_GATEWAY + "/risk/{patientId}",
-                    null,
-                    Void.class,
-                    doctorNote.getPatientId()
-            );
-        } catch (Exception e) {
-            log.error("fail to send assessment request");
-        }
-
         doctorNote.setNote("");
         model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
+        model.addAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Note Created !");
         return TEMPLATE_NOTE_CREATE;
     }
 
 
-
-    @GetMapping("patient/update/{id}")
-    public String showUpdateForm(@PathVariable int id, Model model) {
+    // old url : patient/update/{id}
+    @GetMapping("/patient/{patientId}/update")
+    public String showUpdateForm(@PathVariable Integer patientId, Model model) {
         try {
-            Patient patient = restTemplate.getForObject(
-                    URL_GATEWAY+ "/patient/update/" + id,
-                    Patient.class);
+            final Patient patient = patientClient.getById(patientId);
             model.addAttribute(ATTRIBUTE_PATIENT, patient);
             log.info("updating patient {}", patient.getId());
             return TEMPLATE_PATIENT_UPDATE;
@@ -166,29 +149,28 @@ public class WebController {
         }
     }
 
-    @PostMapping("/patient/update")
+    //Old url : "/patient/update"
+    @PostMapping("/patient/{patientId}/update")
     public String updatePatient(
+            @PathVariable Integer patientId,
             @Valid Patient patient,
             BindingResult result,
             Model model,
             RedirectAttributes redirectAttributes
     ) {
-        if (result.hasErrors()) {
+        if (result.hasErrors() || !Objects.equals(patientId, patient.getId())) {
+            final String errorMsg = result.hasErrors() ? "input form not valid !" : "input form corrupted";
+            log.error(errorMsg);
             model.addAttribute(ATTRIBUTE_PATIENT, patient);
             model.addAttribute(ATTRIBUTE_RESULT, result);
-            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "input form not valid !");
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, errorMsg);
             return TEMPLATE_PATIENT_UPDATE;
         }
         try {
-            HttpEntity<Patient> request = new HttpEntity<>(patient);
-            ResponseEntity<Patient> response = restTemplate.exchange(
-                    URL_GATEWAY + "/patient/update",
-                    HttpMethod.PUT,
-                    request,
-                    Patient.class
-            );
+            patientClient.update(patient);
             redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE,
                     String.format("Patient %s %s is updated !", patient.getFirstName(), patient.getLastName()));
+            log.info("patient {} updated", patient.getId());
             return "redirect:/patient/list";
         } catch (HttpClientErrorException e) {
             //4xx errors
@@ -210,9 +192,10 @@ public class WebController {
         }
     }
 
-    @GetMapping("patient/add")
+    @GetMapping("/patient/add")
     public String showAddPatient(Model model) {
         model.addAttribute(ATTRIBUTE_PATIENT, new Patient());
+        log.info("Creating a new patient");
         return TEMPLATE_PATIENT_CREATE;
     }
 
@@ -227,32 +210,18 @@ public class WebController {
             model.addAttribute(ATTRIBUTE_PATIENT, patient);
             model.addAttribute(ATTRIBUTE_RESULT, result);
             model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "input form not valid !");
+            log.error("input form not valid !");
             return TEMPLATE_PATIENT_CREATE;
         }
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
-            ResponseEntity<Patient> response = restTemplate.exchange(
-                    URL_GATEWAY + "/patient/add",
-                    HttpMethod.POST,
-                    request,
-                    Patient.class
-            );
-            log.info("Patient created successfully: {}", response.getBody().getId());
-            redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Patient created !");
+            final Patient savedPatient = patientClient.save(patient);
+            log.info("Patient created successfully: {}", savedPatient.getId());
+            redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE, String.format(
+                    "Patient %s %s created !", patient.getFirstName(), patient.getLastName()));
             return "redirect:/patient/list";
         } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                log.error("Bad request when creating patient: {}", e.getResponseBodyAsString());
-                model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Invalid patient date. Please check your input");
-            } else if (e.getStatusCode() == HttpStatus.CONFLICT) {
-                log.error("Conflict when creating patient {}", e.getResponseBodyAsString());
-                model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Patient already exists.");
-            } else {
-                log.error("Client error when creating patient: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
-                model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Unable to create patient.");
-            }
+            log.error("Client error when creating patient: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Unable to create patient.");
             model.addAttribute(ATTRIBUTE_PATIENT, patient);
             return TEMPLATE_PATIENT_CREATE;
         } catch (HttpServerErrorException e) {
@@ -268,26 +237,42 @@ public class WebController {
         }
     }
 
-    @GetMapping("patient/delete/{id}")
-    public String deletePatient(@PathVariable int id, RedirectAttributes redirectAttributes) {
+    // old url : "patient/delete/{id}"
+    @GetMapping("/patient/{patientId}/delete")
+    public String deletePatient(@PathVariable Integer patientId, RedirectAttributes redirectAttributes) {
         try {
-            restTemplate.delete(URL_GATEWAY + "/patient/delete/" + id);
-            log.info("Deleting patient {}", id);
+            patientClient.delete(patientId);
+            log.info("Patient {} deleted", patientId);
             redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Patient deleted");
-            restTemplate.delete(URL_GATEWAY + "/note/patient/" + id);
             return "redirect:/patient/list";
         } catch (HttpClientErrorException e) {
-            log.error("Client error when deleting patient {} {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());
+            log.error("Client error when deleting patient {} {} - {}", patientId, e.getStatusCode(), e.getResponseBodyAsString());
             redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Client error when deleting");
             return "redirect:/patient/list";
         } catch (HttpServerErrorException e) {
-            log.error("Server error when deleting patient {} {} - {}", id, e.getStatusCode(), e.getResponseBodyAsString());
+            log.error("Server error when deleting patient {} {} - {}", patientId, e.getStatusCode(), e.getResponseBodyAsString());
             redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Server error when deleting patient");
             return "redirect:/patient/list";
         } catch (Exception e) {
-            log.error("Unexpected error when deleting patient {} {}", id, e.getMessage(), e);
+            log.error("Unexpected error when deleting patient {} {}", patientId, e.getMessage(), e);
             redirectAttributes.addFlashAttribute(ATTRIBUTE_ERROR_MESSAGE, "Unexpected error when deleting patient");
             return "redirect:/patient/list";
         }
     }
+
+
+    @GetMapping("/patient/{patientId}/risk")
+    public String showPatientRisk(@PathVariable Integer patientId) {
+        try {
+            final Risk risk = riskClient.getRiskForPatient(patientId);
+            log.info("For the patient {} the risk assessed is {}", patientId, risk);
+        } catch (Exception e) {
+            log.error("Couldn't asses the patient {}", patientId);
+        }
+        return "";
+    }
+
+
+
+
 }

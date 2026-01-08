@@ -50,10 +50,10 @@
                     @endfor
                 </td>
                 <td>
-                    <form action="/patient/update/${patient.getId()}" method="get" style="display: inline;">
+                    <form action="/patient/${patient.getId()}/update" method="get" style="display: inline;">
                         <button type="submit">Edit</button>
                     </form>
-                    <form action="/patient/delete/${patient.getId()}" method="get" style="display: inline;">
+                    <form action="/patient/${patient.getId()}/delete" method="get" style="display: inline;">
                         <button type="submit" class="link-button">Delete</button>
                     </form>
                     <form action="/patient/${patient.getId()}/addNote/" method="get" style="display: inline;">

@@ -25,7 +25,7 @@
     <p>${errorMessage}</p>
 @endif
 @if(patient != null)
-    <form action="/patient/update" method="post">
+    <form action="/patient/${patient.getId()}/update" method="post">
         <input type="hidden" name="id" value="${patient.getId()}">
 
         <label for="fname">First name</label>

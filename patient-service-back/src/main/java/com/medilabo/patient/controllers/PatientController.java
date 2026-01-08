@@ -39,7 +39,7 @@ public class PatientController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Patient> getPatientById(@PathVariable int id) {
+    public ResponseEntity<Patient> getPatientById(@PathVariable Integer id) {
         try {
             Optional<Patient> optionalPatient = repo.findById(id);
             if (optionalPatient.isEmpty()) {
@@ -56,6 +56,9 @@ public class PatientController {
         }
     }
 
+    /*
+     * DOESN'T CHECK FOR UNIQUENESS
+     */
     @PostMapping
     public ResponseEntity<Patient> createPatient(
             @RequestBody @Valid Patient patient,
@@ -107,7 +110,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePatient(@PathVariable int id) {
+    public ResponseEntity<Void> deletePatient(@PathVariable Integer id) {
         try {
             repo.deleteById(id);
             log.info("Patient {} deleted from database", id);

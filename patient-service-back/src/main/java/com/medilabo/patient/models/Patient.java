@@ -38,6 +38,7 @@ public class Patient {
     @Transient
     private List<DoctorNote> noteList;
 
+    @Transient
     private Risk risk;
 
     public Patient(String firstName, String lastName, LocalDate birthday, Gender gender, String address, String phoneNumber) {

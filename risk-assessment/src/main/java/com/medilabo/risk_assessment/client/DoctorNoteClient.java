@@ -18,7 +18,6 @@ public class DoctorNoteClient extends AbstractClient {
                 .path("/notes")
                 .queryParam("patientId",patientId)
                 .toUriString();
-
         ResponseEntity<List<DoctorNote>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
