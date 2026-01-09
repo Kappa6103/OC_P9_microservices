@@ -46,6 +46,7 @@ public class PatientController {
                 log.error("Patient didn't exist for id: {}", id);
                 return ResponseEntity.notFound().build();
             }
+            log.info("Patient {} found in DB", id);
             return ResponseEntity.ok(optionalPatient.get());
         } catch (DataAccessException e) {
             log.error("Error with the database when fetching patient {}", id);
@@ -69,7 +70,8 @@ public class PatientController {
             return ResponseEntity.badRequest().build();
         }
         try {
-            Patient saved = repo.save(patient);
+            final Patient saved = repo.save(patient);
+            log.info("Patient {} saved in DB", saved.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (DataAccessException e) {
             log.error("Error with the database when creating patient {}", patient.getFirstName());
@@ -96,9 +98,13 @@ public class PatientController {
             return ResponseEntity.badRequest().build();
         }
         try {
-            final var savedPatient = repo.save(patient);
-            log.info("Patient {} updated", savedPatient.getId());
-            return ResponseEntity.ok(savedPatient);
+            if (!repo.existsById(id)) {
+                log.error("Patient {} not found, can't update", id);
+                return ResponseEntity.notFound().build();
+            }
+            final Patient saved = repo.save(patient);
+            log.info("Patient {} updated", saved.getId());
+            return ResponseEntity.ok(saved);
 
         } catch (DataAccessException e) {
             log.error("Error with the database when updating patient {}", patient.getId());
@@ -112,6 +118,10 @@ public class PatientController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePatient(@PathVariable Integer id) {
         try {
+            if (!repo.existsById(id)) {
+                log.error("Patient {} not found, can't delete", id);
+                return ResponseEntity.notFound().build();
+            }
             repo.deleteById(id);
             log.info("Patient {} deleted from database", id);
             return ResponseEntity.noContent().build();
