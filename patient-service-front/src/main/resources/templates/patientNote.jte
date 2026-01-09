@@ -5,6 +5,7 @@
 @param String errorMessage
 
 @param DoctorNote doctorNote
+@param List<DoctorNote> existingNotes
 @param BindingResult result
 
 <!doctype html>
@@ -15,6 +16,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <h1>Page de creation</h1>
@@ -28,6 +30,13 @@
     <p>${successMessage}</p>
 @endif
 @if(doctorNote != null)
+    @if(existingNotes != null && !existingNotes.isEmpty())
+        <div>Existing notes : </div>
+        @for(DoctorNote existingNote : existingNotes)
+            <span>${existingNote.getNote()}</span>
+        @endfor
+    @endif
+
     <form action="/patient/${doctorNote.getPatientId()}/addNote" method="post">
         <input type="hidden" name="patientId" value="${doctorNote.getPatientId()}">
         

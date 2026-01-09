@@ -10,13 +10,14 @@ import com.medilabo.patient_service_front.service.Service;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -48,6 +49,7 @@ public class WebController {
     private static final String ATTRIBUTE_ERROR_MESSAGE = "errorMessage";
     private static final String ATTRIBUTE_SUCCESS_MESSAGE = "successMessage";
     private static final String ATTRIBUTE_DOCTOR_NOTE = "doctorNote";
+    private static final String ATTRIBUTE_EXISTING_DOCTOR_NOTE = "existingNotes";
 
     @GetMapping("/patient/list")
     public String patientList(Model model) {
@@ -87,6 +89,7 @@ public class WebController {
             doctorNote.setPatientId(patientId);
             log.info("Creating new note with patient id: {}", patientId);
             model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
+            model.addAttribute(ATTRIBUTE_EXISTING_DOCTOR_NOTE, getNotesForPatient(patientId));
             return TEMPLATE_NOTE_CREATE;
         } catch (Exception e) {
             log.error("Exception when fetching patient {}", e.getMessage());
@@ -103,22 +106,26 @@ public class WebController {
             model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
             model.addAttribute(ATTRIBUTE_RESULT, result);
             model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, errorMsg);
+            model.addAttribute(ATTRIBUTE_EXISTING_DOCTOR_NOTE, getNotesForPatient(patientId));
             return TEMPLATE_NOTE_CREATE;
         }
         try {
-            noteClient.saveNote(doctorNote);
-            log.info("note saved");
+            final DoctorNote savedNote = noteClient.saveNote(doctorNote);
+            log.info("note {} saved", savedNote.getId());
+            doctorNote.setNote("");
+            model.addAttribute(ATTRIBUTE_EXISTING_DOCTOR_NOTE, getNotesForPatient(patientId));
+            model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
+            model.addAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Note Created !");
+            return TEMPLATE_NOTE_CREATE;
         } catch (Exception e) {
             final String note = doctorNote.getNote();
             final String cropped = note.length() > 100 ? note.substring(0, 100) + "..." : note;
             log.error("error when posting the note [{}]", cropped);
             model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, "Technical error: Note was not saved correctly.");
+            model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
+            model.addAttribute(ATTRIBUTE_EXISTING_DOCTOR_NOTE, getNotesForPatient(patientId));
             return TEMPLATE_NOTE_CREATE;
         }
-        doctorNote.setNote("");
-        model.addAttribute(ATTRIBUTE_DOCTOR_NOTE, doctorNote);
-        model.addAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Note Created !");
-        return TEMPLATE_NOTE_CREATE;
     }
 
 
@@ -237,11 +244,17 @@ public class WebController {
         }
     }
 
+    //TODO SHOULD REFACTOR : 404 MEANS SERVICE IS DOWN AS WELL AS NO RESSOURCES FOUND BETTER TO RETURN A EMPTY BODY WITH A 200 CODE
     // old url : "patient/delete/{id}"
     @GetMapping("/patient/{patientId}/delete")
     public String deletePatient(@PathVariable Integer patientId, RedirectAttributes redirectAttributes) {
         try {
             patientClient.delete(patientId);
+            try {
+                noteClient.deletePatientNotes(patientId);
+            } catch (HttpClientErrorException.NotFound e) {
+                log.error("no note to delete for patient {}", patientId);
+            }
             log.info("Patient {} deleted", patientId);
             redirectAttributes.addFlashAttribute(ATTRIBUTE_SUCCESS_MESSAGE, "Patient deleted");
             return "redirect:/patient/list";
@@ -260,19 +273,29 @@ public class WebController {
         }
     }
 
-
     @GetMapping("/patient/{patientId}/risk")
+    @ResponseBody
     public String showPatientRisk(@PathVariable Integer patientId) {
         try {
             final Risk risk = riskClient.getRiskForPatient(patientId);
-            log.info("For the patient {} the risk assessed is {}", patientId, risk);
+            log.info("For the patient {} the risk assessed is {}", patientId, risk.getLabel());
+            return "<div>" + risk.getLabel() + "</div>";
         } catch (Exception e) {
-            log.error("Couldn't asses the patient {}", patientId);
+            log.error("Couldn't assess the patient {}", patientId);
+            return "<div>Couldn't assess the patient, try again later</div>";
         }
-        return "";
+
     }
 
-
-
+    private List<DoctorNote> getNotesForPatient(Integer patientId) {
+        try {
+            final List<DoctorNote> notesForPatient = List.copyOf(noteClient.getAllNotesByPatientId(patientId));
+            log.info("For patient {}, fetched {} notes", patientId, notesForPatient.size());
+            return notesForPatient;
+        } catch (Exception e) {
+            log.error("Failed to retrieve list for patient {}", patientId);
+            return Collections.emptyList();
+        }
+    }
 
 }

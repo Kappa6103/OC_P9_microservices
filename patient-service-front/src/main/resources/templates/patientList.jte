@@ -14,6 +14,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js" integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz" crossorigin="anonymous"></script>
 </head>
 <body>
 @if(successMessage != null && !successMessage.isBlank())
@@ -34,6 +35,7 @@
             <th>address</th>
             <th>Phone number</th>
             <th>Note</th>
+            <th>Risk</th>
             <th>Action</th>
         </tr>
         @for(var patient : patientList)
@@ -50,13 +52,22 @@
                     @endfor
                 </td>
                 <td>
+                    <button
+                            hx-get="/patient/${patient.getId()}/risk"
+                            hx-swap="outerHTML"
+                            hx-target="this"
+                    >
+                        Assess Patient
+                    </button>
+                </td>
+                <td>
                     <form action="/patient/${patient.getId()}/update" method="get" style="display: inline;">
                         <button type="submit">Edit</button>
                     </form>
                     <form action="/patient/${patient.getId()}/delete" method="get" style="display: inline;">
                         <button type="submit" class="link-button">Delete</button>
                     </form>
-                    <form action="/patient/${patient.getId()}/addNote/" method="get" style="display: inline;">
+                    <form action="/patient/${patient.getId()}/addNote" method="get" style="display: inline;">
                         <button type="submit" class="link-button">Add note</button>
                     </form>
                 </td>

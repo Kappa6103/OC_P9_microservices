@@ -133,7 +133,7 @@ public class NoteController {
     }
 
     @DeleteMapping("/patient/{patientId}")
-    public ResponseEntity<Void> deletePatientNote(@PathVariable Integer patientId) {
+    public ResponseEntity<Void> deletePatientNotes(@PathVariable Integer patientId) {
         try {
             if (!repo.existsByPatientId(patientId)) {
                 log.info("Note(s) with patientId {} not found", patientId);

@@ -17,6 +17,11 @@ public class RiskAssessmentController {
     @Autowired
     RiskAssessmentService service;
 
+    @GetMapping("/risk")
+    public ResponseEntity<String> hello() {
+        return ResponseEntity.ok("Hello World");
+    }
+
     @GetMapping("/risk/{patientId}")
     public ResponseEntity<Risk> receiveAssessmentRequest(@PathVariable Integer patientId) {
         try {

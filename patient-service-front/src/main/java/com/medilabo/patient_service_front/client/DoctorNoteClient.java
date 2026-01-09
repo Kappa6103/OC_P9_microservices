@@ -2,7 +2,6 @@ package com.medilabo.patient_service_front.client;
 
 
 import com.medilabo.patient_service_front.models.DoctorNote;
-import jakarta.validation.Valid;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -48,18 +47,33 @@ public class DoctorNoteClient extends AbstractClient {
         return response.getBody();
     }
 
-    public void saveNote(DoctorNote doctorNote) {
+    public DoctorNote saveNote(DoctorNote doctorNote) {
         final String url = UriComponentsBuilder
                 .fromUriString(gatewayUrl)
                 .path(DOCTOR_NOTE_PATH)
                 .toUriString();
 
         HttpEntity<DoctorNote> request = new HttpEntity<>(doctorNote);
-        restTemplate.exchange(
+        ResponseEntity<DoctorNote> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 request,
                 DoctorNote.class
+        );
+        return response.getBody();
+    }
+
+    public void deletePatientNotes(Integer patientId) {
+        final String url = UriComponentsBuilder
+                .fromUriString(gatewayUrl)
+                .path(DOCTOR_NOTE_PATH + "/patient/{patientId}")
+                .buildAndExpand(patientId)
+                .toUriString();
+        restTemplate.exchange(
+                url,
+                HttpMethod.DELETE,
+                null,
+                Void.class
         );
     }
 }
