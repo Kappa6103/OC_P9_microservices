@@ -10,7 +10,6 @@ import com.medilabo.patient_service_front.service.Service;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -279,8 +278,8 @@ public class WebController {
         }
     }
 
-    @GetMapping("/patient/{patientId}/risk")
     @ResponseBody
+    @GetMapping("/patient/{patientId}/risk")
     public String showPatientRisk(@PathVariable Integer patientId) {
         try {
             final Risk risk = riskClient.getRiskForPatient(patientId);
@@ -288,7 +287,7 @@ public class WebController {
             return "<div>" + risk.getLabel() + "</div>";
         } catch (Exception e) {
             log.error("Couldn't assess the patient {}", patientId);
-            return "<div>Couldn't assess the patient, try again later</div>";
+            return "<div>Couldn't access the Assessment service, try again later</div>";
         }
 
     }
