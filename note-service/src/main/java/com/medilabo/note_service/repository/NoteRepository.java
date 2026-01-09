@@ -10,4 +10,6 @@ import java.util.List;
 public interface NoteRepository extends MongoRepository<DoctorNote, String> {
     List<DoctorNote> findByPatientId(Integer id);
     void deleteAllByPatientId(Integer id);
+    boolean existsByPatientId(Integer id);
+
 }

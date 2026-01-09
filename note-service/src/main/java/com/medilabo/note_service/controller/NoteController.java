@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -88,6 +89,10 @@ public class NoteController {
             log.error("DoctorNote not valid");
             return ResponseEntity.badRequest().build();
         }
+        if(!Objects.equals(noteId, note.getId())) {
+            log.error("Corrupted request, note id and pathVariable not equal");
+            return ResponseEntity.badRequest().build();
+        }
         try {
             Optional<DoctorNote> optionalDoctorNote = repo.findById(noteId);
             if (optionalDoctorNote.isEmpty()) {
@@ -111,6 +116,10 @@ public class NoteController {
     @DeleteMapping("/{noteId}")
     public ResponseEntity<Void> deleteNote(@PathVariable String noteId) {
         try {
+            if (!repo.existsById(noteId)) {
+                log.info("Note(s) with id {} not found", noteId);
+                return ResponseEntity.notFound().build();
+            }
             repo.deleteById(noteId);
             log.info("Note deleted with noteId: {}", noteId);
             return ResponseEntity.noContent().build();
@@ -124,8 +133,12 @@ public class NoteController {
     }
 
     @DeleteMapping("/patient/{patientId}")
-    public ResponseEntity<Void> deletePatientNote(@PathVariable int patientId) {
+    public ResponseEntity<Void> deletePatientNote(@PathVariable Integer patientId) {
         try {
+            if (!repo.existsByPatientId(patientId)) {
+                log.info("Note(s) with patientId {} not found", patientId);
+                return ResponseEntity.notFound().build();
+            }
             repo.deleteAllByPatientId(patientId);
             log.info("Notes deleted with patientId: {}", patientId);
             return ResponseEntity.noContent().build();
