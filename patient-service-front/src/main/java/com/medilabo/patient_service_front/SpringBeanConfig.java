@@ -4,6 +4,8 @@ package com.medilabo.patient_service_front;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -12,11 +14,17 @@ import java.time.Duration;
 public class SpringBeanConfig {
 
     @Bean
-    public RestTemplate getRestTemplate(RestTemplateBuilder builder) {
+    public RestTemplate getRestTemplate(RestTemplateBuilder builder, AuthenticationInterceptor interceptor) {
         return builder
+                .additionalInterceptors(interceptor)
                 .connectTimeout(Duration.ofSeconds(3))
                 .readTimeout(Duration.ofSeconds(3))
                 .build();
+    }
+
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
     }
 
 }
