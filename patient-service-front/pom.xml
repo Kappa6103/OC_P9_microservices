@@ -93,7 +93,7 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<sourceDirectory>${project.basedir}/src/main/jte</sourceDirectory>
+							<sourceDirectory>${project.basedir}/src/main/resources/templates</sourceDirectory>
 							<contentType>Html</contentType>
 							<binaryStaticContent>true</binaryStaticContent>
 							<targetResourceDirectory>${project.build.outputDirectory}</targetResourceDirectory>
