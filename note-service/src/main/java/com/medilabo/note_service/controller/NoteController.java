@@ -23,6 +23,11 @@ public class NoteController {
     @Autowired
     private NoteRepository repo;
 
+    @GetMapping("")
+    public String home() {
+        return "Hi from Note Service!";
+    }
+
     @GetMapping
     public ResponseEntity<List<DoctorNote>> getAllNotes() {
         try {

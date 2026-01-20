@@ -51,6 +51,12 @@ public class WebController {
     private static final String ATTRIBUTE_DOCTOR_NOTE = "doctorNote";
     private static final String ATTRIBUTE_EXISTING_DOCTOR_NOTE = "existingNotes";
 
+    @GetMapping("")
+    @ResponseBody
+    public String home() {
+        return "Hi from Web Fronted Service!";
+    }
+
     @GetMapping("/patient/list")
     public String patientList(Model model) {
         try {

@@ -1,13 +1,14 @@
 # Use existing image as base
-FROM alpine/java:22-jre
+FROM eclipse-temurin:21-jre
 
-WORKDIR /opt/myApp
+WORKDIR /opt/springboot
 
 # Retrieve needed files and dependencies
-COPY ./target/web-frontend-0.0.1-SNAPSHOT.jar web-frontend-0.0.1-SNAPSHOT.jar
+COPY ./target/web-frontend-0.0.1-SNAPSHOT.jar web-frontend.jar
 
-# Specify a start-up command
-#CMD ["java", "-jar", "/web-frontend-0.0.1-SNAPSHOT.jar"]
+# Install a sweet file manager
+RUN apt-get update && apt-get install -y mc
 
-# Specify a start-up command with the active profile
-ENTRYPOINT ["java", "-Dspring.profiles.active=docker", "-jar", "/web-frontend-0.0.1-SNAPSHOT.jar"]
+# Specify a start-up command with the active profile, this is the "fixex arg"
+ENTRYPOINT ["java", "-jar", "/opt/springboot/web-frontend.jar"]
+CMD ["-Dspring.profiles.active=docker"]

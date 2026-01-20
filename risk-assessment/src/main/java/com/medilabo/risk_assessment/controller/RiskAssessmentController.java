@@ -17,6 +17,11 @@ public class RiskAssessmentController {
     @Autowired
     RiskAssessmentService service;
 
+    @GetMapping("")
+    public String home() {
+        return "Hi from Risk Assessment Service!";
+    }
+
     @GetMapping("/risk")
     public ResponseEntity<String> hello() {
         return ResponseEntity.ok("Hello World");

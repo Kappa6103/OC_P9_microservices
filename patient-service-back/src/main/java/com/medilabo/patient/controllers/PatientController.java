@@ -23,6 +23,11 @@ public class PatientController {
     @Autowired
     PatientRepository repo;
 
+    @GetMapping("")
+    public String home() {
+        return "Hi from Patient Backend Service!";
+    }
+
     @GetMapping
     public ResponseEntity<List<Patient>> getAllPatients() {
         try {
