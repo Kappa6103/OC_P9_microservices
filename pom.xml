@@ -1,0 +1,15 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.medilabo</groupId>
+    <artifactId>oc-p9-microservices</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>api-gateway-webmvc</module>
+        <module>note-service</module>
+        <module>patient-service-back</module>
+        <module>risk-assessment</module>
+        <module>web-frontend</module>
+    </modules>
+</project>

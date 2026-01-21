@@ -23,7 +23,7 @@ public class PatientController {
     @Autowired
     PatientRepository repo;
 
-    @GetMapping("")
+    @GetMapping("/")
     public String home() {
         return "Hi from Patient Backend Service!";
     }

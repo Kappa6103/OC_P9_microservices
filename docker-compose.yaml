@@ -1,0 +1,85 @@
+services:
+
+  gateway:
+    image: gateway:latest
+    container_name: gateway
+    build: api-gateway-webmvc
+    pull_policy: never
+    ports:
+      - "8081:8081" #left is host, right is container
+
+  web-frontend:
+    image: web-frontend:latest
+    container_name: web-frontend
+    build: web-frontend
+    pull_policy: never
+    ports:
+      - "8080:8080"
+
+  patient-service:
+    image: patient-service:latest
+    container_name: patient-service
+    build: patient-service-back
+    pull_policy: never
+    ports:
+      - "8082:8082"
+    environment:
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PWD: ${POSTGRES_PWD}
+    depends_on:
+      - "postgres"
+
+  note-service:
+    image: note-service:latest
+    container_name: note-service
+    build: note-service
+    pull_policy: never
+#    ports:
+#      - "8083:8083"
+    environment:
+      MONGO_ADMIN_USER: ${MONGO_ADMIN_USER}
+      MONGO_ADMIN_PASS: ${MONGO_ADMIN_PASS}
+    depends_on:
+      - "mongodb"
+      - "mongo-express"
+
+  risk-assessment:
+    image: risk-assessment:latest
+    container_name: risk-assessment
+    build: risk-assessment
+    pull_policy: never
+    ports:
+      - "8084:8084"
+
+  postgres:
+    image: postgres:18.1
+    container_name: postgresDB
+    restart: unless-stopped
+    shm_size: 128mb #shared memory limit
+    environment:
+      POSTGRES_DB: p9_test
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PWD}
+    ports:
+      - "5432:5432"
+
+  mongodb:
+    image: mongo:8.2.3
+    container_name: mongoDB
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ADMIN_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ADMIN_PASS}
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongoExpress
+    ports:
+      - "8085:8081" #left is host, right is container
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ADMIN_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ADMIN_PASS}
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    depends_on:
+      - "mongodb"

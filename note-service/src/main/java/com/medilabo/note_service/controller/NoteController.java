@@ -2,6 +2,7 @@ package com.medilabo.note_service.controller;
 
 import com.medilabo.note_service.model.DoctorNote;
 import com.medilabo.note_service.repository.NoteRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,18 @@ public class NoteController {
     @Autowired
     private NoteRepository repo;
 
-    @GetMapping("")
+    @PostConstruct
+    private void putSomeDataInDB() {
+        final int patientId = 1000;
+        for (int i = 0; i < 10; i++) {
+            DoctorNote doctorNote = new DoctorNote();
+            doctorNote.setPatientId(patientId + i);
+            doctorNote.setNote("coucou " + i);
+            repo.save(doctorNote);
+        }
+    }
+
+    @GetMapping("/ping")
     public String home() {
         return "Hi from Note Service!";
     }

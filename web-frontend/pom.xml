@@ -11,7 +11,7 @@
 	<groupId>com.medilabo</groupId>
 	<artifactId>web-frontend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>patient-service-front</name>
+	<name>web-frontend</name>
 	<description>server ui for medilabo patient service</description>
 	<url/>
 	<licenses>
