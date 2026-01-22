@@ -21,8 +21,8 @@ services:
     container_name: patient-service
     build: patient-service-back
     pull_policy: never
-    ports:
-      - "8082:8082"
+#    ports:
+#      - "8082:8082" #left is host, right is container21
     environment:
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PWD: ${POSTGRES_PWD}
@@ -48,8 +48,8 @@ services:
     container_name: risk-assessment
     build: risk-assessment
     pull_policy: never
-    ports:
-      - "8084:8084"
+#    ports:
+#      - "8084:8084"
 
   postgres:
     image: postgres:18.1
@@ -60,14 +60,14 @@ services:
       POSTGRES_DB: p9_test
       POSTGRES_USER: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PWD}
-    ports:
-      - "5432:5432"
+#    ports:
+#      - "5432:5432"
 
   mongodb:
     image: mongo:8.2.3
     container_name: mongoDB
-    ports:
-      - "27017:27017"
+#    ports:
+#      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ADMIN_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ADMIN_PASS}
