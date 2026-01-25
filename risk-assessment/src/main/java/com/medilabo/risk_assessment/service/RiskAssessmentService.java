@@ -5,6 +5,7 @@ import com.medilabo.risk_assessment.client.PatientClient;
 import com.medilabo.risk_assessment.model.DoctorNote;
 import com.medilabo.risk_assessment.model.Patient;
 import com.medilabo.risk_assessment.model.Risk;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,27 +26,25 @@ public class RiskAssessmentService {
     public Risk assessPatient(Integer patientId) {
         Patient patient = patientClient.getPatientById(patientId);
         List<DoctorNote> allExistingNotes = noteClient.getAllNotesByPatientId(patientId);
-        Risk risk;
+
         if (allExistingNotes.isEmpty()) {
-            risk = Risk.NONE;
-        } else {
-            calculateTriggerWordsCount(allExistingNotes);
-            RiskJudger riskJudger = getRiskJudger(patient, allExistingNotes);
-            risk = riskJudger.assessPatient();
+            return Risk.NONE;
         }
-        return risk;
+
+        calculateTriggerWordsCount(allExistingNotes);
+        RiskJudger riskJudger = getRiskJudger(patient, allExistingNotes);
+        return riskJudger.assessPatient();
     }
 
-    //TODO boolean flag in the note model to know if the triggerWordsCount is necessary ?
     private void calculateTriggerWordsCount(List<DoctorNote> allExistingNotes) {
         for(DoctorNote doctorNote : allExistingNotes) {
-            NoteJudger noteJudger = getNoteJudger(doctorNote.getNote());
-            doctorNote.setTriggerWordsCount(noteJudger.getScore());
+            TriggerCounter triggerCounter = getTriggerCounter(doctorNote.getNote());
+            doctorNote.setTriggerWordsCount(triggerCounter.getCount());
         }
     }
 
-    private NoteJudger getNoteJudger(String note) {
-        return new NoteJudger(note);
+    private TriggerCounter getTriggerCounter(String note) {
+        return new TriggerCounter(note);
     }
 
     private RiskJudger getRiskJudger(Patient patient, List<DoctorNote> allExistingNotes) {

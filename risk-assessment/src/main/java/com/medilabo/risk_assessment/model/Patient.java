@@ -51,6 +51,13 @@ public class Patient {
         this.birthday = birthday;
         this.gender = gender;
     }
+    public Patient(String firstName, String lastName, LocalDate birthday, Gender gender, List<DoctorNote> noteList) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.noteList = noteList;
+    }
 
     public String getFormattedBirthday() {
         return String.format("%s-%s-%s", birthday.getDayOfMonth(), birthday.getMonth(), birthday.getYear());

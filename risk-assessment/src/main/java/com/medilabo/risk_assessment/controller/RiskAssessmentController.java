@@ -17,27 +17,14 @@ public class RiskAssessmentController {
     @Autowired
     RiskAssessmentService service;
 
-    @GetMapping("")
-    public String home() {
-        return "Hi from Risk Assessment Service!";
-    }
-
-    @GetMapping("/risk")
-    public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("Hello World");
-    }
-
     @GetMapping("/risk/{patientId}")
     public ResponseEntity<Risk> receiveAssessmentRequest(@PathVariable Integer patientId) {
         try {
-            log.info("processing Assessment request for patientId {}",
-                    patientId);
-            final Risk risk = service.assessPatient(patientId);
-            return ResponseEntity.ok(risk);
+            log.info("processing Assessment request for patientId {}", patientId);
+            return ResponseEntity.ok(service.assessPatient(patientId));
         } catch (Exception e) {
             log.error("failed to assess patient {}", patientId, e);
             return ResponseEntity.internalServerError().build();
         }
     }
-
 }

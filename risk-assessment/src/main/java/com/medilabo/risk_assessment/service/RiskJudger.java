@@ -9,6 +9,11 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
+/**
+ * The RiskJudger class provides methods to assess the health risk level of a patient
+ * based on medical notes, trigger words, and the patient's demographic information.
+ * The risk assessment leverages predefined risk categories and thresholds.
+ */
 public class RiskJudger {
 
     private Risk risk;

@@ -1,4 +1,4 @@
-package com.medilabo.risk_assessment;
+package com.medilabo.risk_assessment.client.configuration;
 
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 
 @Configuration
-public class SpringBeanConfig {
+public class ClientBeanConfig {
 
     @Bean
     public RestTemplate getRestTemplate(RestTemplateBuilder builder) {
