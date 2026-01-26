@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -86,7 +83,6 @@ public class WebController {
         }
     }
 
-    //previous url : "/patient/addNote/{id}"
     @GetMapping("/patient/{patientId}/addNote")
     public String addNote(@PathVariable Integer patientId, Model model) {
         try {
@@ -102,7 +98,6 @@ public class WebController {
         }
     }
 
-    //previous url : "/patient/addNote"
     @PostMapping("/patient/{patientId}/addNote")
     public String saveNote(@PathVariable Integer patientId, @Valid DoctorNote doctorNote, BindingResult result, Model model) {
         if (result.hasErrors() || !Objects.equals(patientId, doctorNote.getPatientId())) {
@@ -161,7 +156,6 @@ public class WebController {
         }
     }
 
-    //Old url : "/patient/update"
     @PostMapping("/patient/{patientId}/update")
     public String updatePatient(
             @PathVariable Integer patientId,
@@ -173,7 +167,7 @@ public class WebController {
         if (result.hasErrors() || !Objects.equals(patientId, patient.getId())) {
             final String errorMsg = result.hasErrors() ? "input form not valid !" : "input form corrupted";
             log.error(errorMsg);
-            model.addAttribute(ATTRIBUTE_PATIENT, patient);
+            // model.addAttribute(ATTRIBUTE_PATIENT, patient);
             model.addAttribute(ATTRIBUTE_RESULT, result);
             model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, errorMsg);
             return TEMPLATE_PATIENT_UPDATE;
@@ -249,8 +243,6 @@ public class WebController {
         }
     }
 
-    //TODO SHOULD REFACTOR : 404 MEANS SERVICE IS DOWN AS WELL AS NO RESSOURCES FOUND BETTER TO RETURN A EMPTY BODY WITH A 200 CODE
-    // old url : "patient/delete/{id}"
     @GetMapping("/patient/{patientId}/delete")
     public String deletePatient(@PathVariable Integer patientId, RedirectAttributes redirectAttributes) {
         try {

@@ -20,13 +20,14 @@
     <h1>retour a la liste</h1>
 </a>
 @if(errorMessage != null && !errorMessage.isBlank())
-    <p>${errorMessage}</p>
+    <p class="errorMsg">${errorMessage}</p>
 @endif
 @if(patient != null)
     <form action="/patient/add" method="post">
         <label for="fname">First name</label>
         <input id="fname"
                type="text"
+               value="${patient.getFirstName()}"
                name="firstName"
         >
         @if(result != null && result.hasFieldErrors("firstName"))
@@ -36,6 +37,7 @@
         <label for="lname">Last name</label>
         <input id="lname"
                type="text"
+               value="${patient.getLastName()}"
                name="lastName"
         >
         @if(result != null && result.hasFieldErrors("lastName"))
@@ -44,6 +46,7 @@
         <label for="dob">Date of birth</label>
         <input id="dob"
                type="date"
+               value="${patient.getBirthday() == null ? "" : patient.getBirthday().toString()}"
                name="birthday"
         >
         @if(result != null && result.hasFieldErrors("birthday"))

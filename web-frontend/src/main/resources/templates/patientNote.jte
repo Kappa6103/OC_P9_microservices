@@ -15,7 +15,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Note</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -24,17 +24,19 @@
     <h1>retour a la liste</h1>
 </a>
 @if(errorMessage != null && !errorMessage.isBlank())
-    <p>${errorMessage}</p>
+    <p class="errorMsg">${errorMessage}</p>
 @endif
 @if(successMessage != null && !successMessage.isBlank())
-    <p>${successMessage}</p>
+    <p class="successMsg">${successMessage}</p>
 @endif
 @if(doctorNote != null)
     @if(existingNotes != null && !existingNotes.isEmpty())
         <div>Existing notes : </div>
-        @for(DoctorNote existingNote : existingNotes)
-            <span>${existingNote.getNote()}</span>
-        @endfor
+        <ul>
+            @for(DoctorNote existingNote : existingNotes)
+                <li>${existingNote.getNote()}</li>
+            @endfor
+        </ul>
     @endif
 
     <form action="/patient/${doctorNote.getPatientId()}/addNote" method="post">
