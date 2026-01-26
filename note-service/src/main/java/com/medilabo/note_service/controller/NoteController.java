@@ -24,22 +24,6 @@ public class NoteController {
     @Autowired
     private NoteRepository repo;
 
-    @PostConstruct
-    private void putSomeDataInDB() {
-        final int patientId = 1000;
-        for (int i = 0; i < 10; i++) {
-            DoctorNote doctorNote = new DoctorNote();
-            doctorNote.setPatientId(patientId + i);
-            doctorNote.setNote("coucou " + i);
-            repo.save(doctorNote);
-        }
-    }
-
-    @GetMapping("/ping")
-    public String home() {
-        return "Hi from Note Service!";
-    }
-
     @GetMapping
     public ResponseEntity<List<DoctorNote>> getAllNotes() {
         try {

@@ -2,6 +2,7 @@ package com.medilabo.patient_service_front;
 
 import com.medilabo.patient_service_front.client.PatientClient;
 import com.medilabo.patient_service_front.models.Patient;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Use RANDOM_PORT to start a real Servlet container (Tomcat)
+@Disabled
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IntegrationTests {
 

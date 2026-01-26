@@ -41,24 +41,4 @@ public class Patient {
     @Transient
     private Risk risk;
 
-    public Patient(String firstName, String lastName, LocalDate birthday, Gender gender, String address, String phoneNumber) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthday = birthday;
-        this.gender = gender;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-    }
-
-    public Patient(String firstName, String lastName, LocalDate birthday, Gender gender) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthday = birthday;
-        this.gender = gender;
-    }
-
-    public String getFormattedBirthday() {
-        return String.format("%s-%s-%s", birthday.getDayOfMonth(), birthday.getMonth(), birthday.getYear());
-    }
-
 }

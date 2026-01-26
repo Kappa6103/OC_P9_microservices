@@ -35,8 +35,30 @@ public class Patient {
 
     private Risk risk;
 
+    public Patient(String firstName, String lastName, LocalDate birthday, Gender gender, String address, String phoneNumber) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+    }
+
     public String getFormattedBirthday() {
         return String.format("%s-%s-%s", birthday.getDayOfMonth(), birthday.getMonth(), birthday.getYear());
     }
 
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthday=" + birthday +
+                ", gender=" + gender +
+                ", address='" + address + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", risk=" + risk +
+                '}';
+    }
 }

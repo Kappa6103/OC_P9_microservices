@@ -7,7 +7,7 @@ WORKDIR /opt/springboot
 COPY ./target/patient-service-back-0.0.1-SNAPSHOT.jar patient-service.jar
 
 # Install a sweet file manager
-RUN apt-get update && apt-get install -y mc
+#RUN apt-get update && apt-get install -y mc
 
 # Specify a start-up command, can be overriden
 #CMD ["java", "-jar", "/opt/springboot/risk-assessment.jar"]

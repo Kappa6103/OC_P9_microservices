@@ -1,6 +1,7 @@
 package com.medilabo.patient_service_front.client;
 
 import com.medilabo.patient_service_front.models.Patient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
+@Slf4j
 @Component
 public class PatientClient extends AbstractClient {
 
@@ -64,13 +66,14 @@ public class PatientClient extends AbstractClient {
                 .build()
                 .toUriString();
         HttpEntity<Patient> request = new HttpEntity<>(patient);
-        restTemplate.exchange(
+        HttpEntity<Patient> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 request,
-                Void.class
+                Patient.class
         );
-        return request.getBody();
+        log.info("patient is back {}", response.getBody());
+        return response.getBody();
     }
 
     public void delete(Integer patientId) {

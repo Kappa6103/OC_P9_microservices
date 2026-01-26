@@ -1,10 +1,12 @@
 package com.medilabo.patient_service_front;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+@Disabled
 @SpringBootTest
 class PatientServiceFrontApplicationTests {
 

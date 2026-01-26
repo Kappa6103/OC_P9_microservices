@@ -7,6 +7,8 @@ services:
     pull_policy: never
     ports:
       - "8081:8081" #left is host, right is container
+    depends_on:
+      - "postgres"
 
   web-frontend:
     image: web-frontend:latest
@@ -15,6 +17,11 @@ services:
     pull_policy: never
     ports:
       - "8080:8080"
+    depends_on:
+      - "patient-service"
+      - "note-service"
+      - "risk-assessment"
+      - "gateway"
 
   patient-service:
     image: patient-service:latest
@@ -50,18 +57,21 @@ services:
     pull_policy: never
 #    ports:
 #      - "8084:8084"
+    depends_on:
+      - "note-service"
+      - "patient-service"
 
   postgres:
     image: postgres:18.1
     container_name: postgresDB
     restart: unless-stopped
     shm_size: 128mb #shared memory limit
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: p9_test
       POSTGRES_USER: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PWD}
-#    ports:
-#      - "5432:5432"
 
   mongodb:
     image: mongo:8.2.3
@@ -83,3 +93,11 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongodb
     depends_on:
       - "mongodb"
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8086:8080"
+    depends_on:
+      - postgres
