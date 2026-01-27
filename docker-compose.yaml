@@ -12,6 +12,7 @@ services:
       POSTGRES_PWD: ${POSTGRES_PWD}
     depends_on:
       - "postgres"
+      - "web-frontend"
 
   web-frontend:
     image: web-frontend:latest
@@ -24,7 +25,6 @@ services:
       - "patient-service"
       - "note-service"
       - "risk-assessment"
-      - "gateway"
 
   patient-service:
     image: patient-service:latest

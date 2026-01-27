@@ -39,7 +39,7 @@ public class Service implements CommandLineRunner {
                 return;
             } catch (Exception e) {
                 attempt++;
-                log.error("Attempt {}/{} to populate the DBs {}. Retrying in 5 seconds...", attempt, maxRetries, e.getMessage());
+                log.error("Attempt {}/{} to populate the DBs. Retrying in 5 seconds...", attempt, maxRetries, e);
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException ie) {

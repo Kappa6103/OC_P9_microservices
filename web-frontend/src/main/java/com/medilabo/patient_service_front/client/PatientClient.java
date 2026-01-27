@@ -2,24 +2,28 @@ package com.medilabo.patient_service_front.client;
 
 import com.medilabo.patient_service_front.models.Patient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.beans.factory.annotation.Autowired;import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.client.RestTemplate;import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
 @Slf4j
 @Component
-public class PatientClient extends AbstractClient {
+public class PatientClient {
 
+    @Autowired
+    RestTemplate restTemplate;
+
+    private static final String PATIENT_SERVICE = "http://patient-service:8082";
     private static final String PATIENT_PATH = "/patients";
     private static final String PATIENT_ID_PATH = PATIENT_PATH + "/{patientId}";
 
 
     public List<Patient> getAll() {
         final String url = UriComponentsBuilder
-                .fromUriString(gatewayUrl)
+                .fromUriString(PATIENT_SERVICE)
                 .path(PATIENT_PATH)
                 .build()
                 .toUriString();
@@ -35,7 +39,7 @@ public class PatientClient extends AbstractClient {
 
     public Patient getById(Integer patientId) {
         final String url = UriComponentsBuilder
-                .fromUriString(gatewayUrl)
+                .fromUriString(PATIENT_SERVICE)
                 .path(PATIENT_ID_PATH)
                 .buildAndExpand(patientId)
                 .toUriString();
@@ -45,7 +49,7 @@ public class PatientClient extends AbstractClient {
 
     public void update(Patient patient) {
         final String url = UriComponentsBuilder
-                .fromUriString(gatewayUrl)
+                .fromUriString(PATIENT_SERVICE)
                 .path(PATIENT_ID_PATH)
                 .buildAndExpand(patient.getId())
                 .toUriString();
@@ -61,7 +65,7 @@ public class PatientClient extends AbstractClient {
 
     public Patient save(Patient patient) {
         final String url = UriComponentsBuilder
-                .fromUriString(gatewayUrl)
+                .fromUriString(PATIENT_SERVICE)
                 .path(PATIENT_PATH)
                 .build()
                 .toUriString();
@@ -78,7 +82,7 @@ public class PatientClient extends AbstractClient {
 
     public void delete(Integer patientId) {
         final String url = UriComponentsBuilder
-                .fromUriString(gatewayUrl)
+                .fromUriString(PATIENT_SERVICE)
                 .path(PATIENT_ID_PATH)
                 .buildAndExpand(patientId)
                 .toUriString();

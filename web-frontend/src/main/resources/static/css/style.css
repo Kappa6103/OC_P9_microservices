@@ -122,3 +122,17 @@ form p { color: #d93025; font-size: 0.8rem; } /* Validation errors */
         border: 0;
     }
 }
+
+/* New class for scrolling notes inside the table */
+.scrollable-notes {
+    max-height: 200px; /* Adjust this to control how tall the window is */
+    overflow-y: auto;  /* This adds the scrollbar only when content overflows */
+    min-width: 350px;  /* Ensures the column is wide enough to be readable */
+    padding-right: 5px; /* Adds space for the scrollbar so text doesn't touch it */
+}
+
+/* Optional: remove default margins from the list to save space */
+.scrollable-notes ul {
+    margin: 0;
+    padding-left: 20px;
+}

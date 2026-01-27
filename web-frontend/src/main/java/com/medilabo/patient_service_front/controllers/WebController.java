@@ -278,7 +278,7 @@ public class WebController {
             log.info("For the patient {} the risk assessed is {}", patientId, risk.getLabel());
             return "<div>" + risk.getLabel() + "</div>";
         } catch (Exception e) {
-            log.error("Couldn't assess the patient {}", patientId);
+            log.error("Couldn't assess the patient {}", patientId, e);
             return "<div>Couldn't access the Assessment service, try again later</div>";
         }
 

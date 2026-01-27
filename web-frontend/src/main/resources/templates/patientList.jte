@@ -47,11 +47,13 @@
                 <td>${patient.getAddress()}</td>
                 <td>${patient.getPhoneNumber()}</td>
                 <td>
-                    <ul>
-                        @for(DoctorNote note : patient.getNoteList())
-                            <li>${note.getNote()}</li>
-                        @endfor
-                    </ul>
+                    <div class="scrollable-notes">
+                        <ul>
+                            @for(DoctorNote note : patient.getNoteList())
+                                <li>${note.getNote()}</li>
+                            @endfor
+                        </ul>
+                    </div>
                 </td>
                 <td>
                     <button
