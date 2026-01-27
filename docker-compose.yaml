@@ -7,6 +7,9 @@ services:
     pull_policy: never
     ports:
       - "8081:8081" #left is host, right is container
+    environment:
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PWD: ${POSTGRES_PWD}
     depends_on:
       - "postgres"
 
