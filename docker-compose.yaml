@@ -6,7 +6,7 @@ services:
     build: api-gateway-webmvc
     pull_policy: never
     ports:
-      - "8081:8081" #left is host, right is container
+      - "8080:8080" #left is host, right is container
     environment:
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PWD: ${POSTGRES_PWD}
@@ -18,8 +18,8 @@ services:
     container_name: web-frontend
     build: web-frontend
     pull_policy: never
-    ports:
-      - "8080:8080"
+#    ports:
+#      - "8081:8081"
     depends_on:
       - "patient-service"
       - "note-service"
@@ -69,8 +69,8 @@ services:
     container_name: postgresDB
     restart: unless-stopped
     shm_size: 128mb #shared memory limit
-    ports:
-      - "5432:5432"
+#    ports:
+#      - "5432:5432"
     environment:
       POSTGRES_DB: p9_test
       POSTGRES_USER: ${POSTGRES_USERNAME}
