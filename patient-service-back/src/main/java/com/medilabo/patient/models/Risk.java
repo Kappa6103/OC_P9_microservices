@@ -4,7 +4,8 @@ public enum Risk {
     NONE("Aucun risque"),
     BORDERLINE("Risque Limité"),
     EARLY_ONSET("Apparition précoce"),
-    IN_DANGER("Danger");
+    IN_DANGER("Danger"),
+    ERROR("Erreur dans le calcul du risque");
 
     private final String label;
 

@@ -4,6 +4,7 @@ import com.medilabo.risk_assessment.model.DoctorNote;
 import com.medilabo.risk_assessment.model.Gender;
 import com.medilabo.risk_assessment.model.Patient;
 import com.medilabo.risk_assessment.model.Risk;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -14,6 +15,7 @@ import java.util.List;
  * based on medical notes, trigger words, and the patient's demographic information.
  * The risk assessment leverages predefined risk categories and thresholds.
  */
+@Slf4j
 public class RiskJudger {
 
     private Risk risk;
@@ -45,7 +47,8 @@ public class RiskJudger {
         } else if (isRiskInDanger()) {
             risk = Risk.IN_DANGER;
         } else {
-            throw new RuntimeException("Couldn't assess the risk !!!");
+            log.error("Error in risk assessment algo for patient {} id {}", patient.getFirstName(), patient.getId());
+            risk = Risk.ERROR;
         }
     }
 
