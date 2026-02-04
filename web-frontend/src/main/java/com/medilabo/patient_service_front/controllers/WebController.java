@@ -46,6 +46,7 @@ public class WebController {
     private static final String ATTRIBUTE_SUCCESS_MESSAGE = "successMessage";
     private static final String ATTRIBUTE_DOCTOR_NOTE = "doctorNote";
     private static final String ATTRIBUTE_EXISTING_DOCTOR_NOTE = "existingNotes";
+    private static final String ATTRIBUTE_USERNAME = "username";
 
     @GetMapping("")
     @ResponseBody
@@ -54,7 +55,7 @@ public class WebController {
     }
 
     @GetMapping("/patient/list")
-    public String patientList(Model model) {
+    public String patientList(@RequestHeader(value = "X-Auth-Username", required = true) String username, Model model) {
         try {
             final List<Patient> patientList = patientClient.getAll();
             log.info("Fetching list of {} patients", patientList.size());
@@ -62,6 +63,7 @@ public class WebController {
             log.info("Fetching list of {} notes", doctorNoteList.size());
             service.patientAndNoteJoiner(patientList, doctorNoteList);
             model.addAttribute(ATTRIBUTE_PATIENT_LIST, patientList);
+            model.addAttribute(ATTRIBUTE_USERNAME, username);
             return TEMPLATE_PATIENT_LIST;
         } catch (HttpClientErrorException e) {
             // 4xx errors

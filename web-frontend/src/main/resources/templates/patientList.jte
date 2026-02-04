@@ -4,6 +4,7 @@
 @param List<Patient> patientList
 @param String successMessage
 @param String errorMessage
+@param String username
 
 <!doctype html>
 <html lang="en">
@@ -22,6 +23,12 @@
 @elseif(errorMessage != null && !errorMessage.isBlank())
     <p class="errorMsg">${errorMessage}</p>
 @endif
+<nav>
+    <p>Welcome ${username}</p>
+    <form action="/logout" method="post">
+        <button type="submit">Logout</button>
+    </form>
+</nav>
 
 @if(patientList.isEmpty())
     <p>There is no Patients in the system</p>

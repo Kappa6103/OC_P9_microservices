@@ -76,7 +76,6 @@ button {
 form > button {
     display: block;
     width: 100%;
-    margin-top: 25px;
     padding: 12px;
 }
 
@@ -135,4 +134,23 @@ form p { color: #d93025; font-size: 0.8rem; } /* Validation errors */
 .scrollable-notes ul {
     margin: 0;
     padding-left: 20px;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+nav p {
+    margin: 0;
+}
+
+nav form {
+    margin: 0;
 }

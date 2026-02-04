@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -21,10 +22,6 @@ public class SpringSecurity {
         return new BCryptPasswordEncoder(COST_FACTOR);
     }
 
-    /*
-    The SecurityFilterChain bean defines which URL paths should be secured and which should not.
-    Specifically, /home path is configured to not require any authentication. All other paths must be authenticated.
-    */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -32,7 +29,8 @@ public class SpringSecurity {
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(Customizer.withDefaults());
+                .formLogin(formLogin ->
+                        formLogin.defaultSuccessUrl("/patient/list", true));
         return http.build();
     }
 

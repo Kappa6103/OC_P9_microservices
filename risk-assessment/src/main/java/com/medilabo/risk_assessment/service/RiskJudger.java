@@ -47,8 +47,7 @@ public class RiskJudger {
         } else if (isRiskInDanger()) {
             risk = Risk.IN_DANGER;
         } else {
-            log.error("Error in risk assessment algo for patient {} id {}", patient.getFirstName(), patient.getId());
-            risk = Risk.ERROR;
+            risk = Risk.LOW;
         }
     }
 
