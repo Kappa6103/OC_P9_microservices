@@ -76,4 +76,8 @@ docker compose up -d
     * usr: MEDILABO_USR
     * pwd: MEDILABO_USR
     * database: p9_test
-    
+
+**Stop**
+```bash
+docker compose stop
+```
