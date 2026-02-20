@@ -1,0 +1,8 @@
+web-frontend: 8080
+gateway: 8081
+patient-service-back: 8082
+
+note-service: 8083
+risk-assessment: 8084
+
+mongo-express: 8085
