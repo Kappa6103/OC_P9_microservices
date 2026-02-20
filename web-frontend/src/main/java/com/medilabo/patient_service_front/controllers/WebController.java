@@ -130,8 +130,6 @@ public class WebController {
         }
     }
 
-
-    // old url : patient/update/{id}
     @GetMapping("/patient/{patientId}/update")
     public String showUpdateForm(@PathVariable Integer patientId, Model model) {
         try {
@@ -169,7 +167,6 @@ public class WebController {
         if (result.hasErrors() || !Objects.equals(patientId, patient.getId())) {
             final String errorMsg = result.hasErrors() ? "input form not valid !" : "input form corrupted";
             log.error(errorMsg);
-            // model.addAttribute(ATTRIBUTE_PATIENT, patient);
             model.addAttribute(ATTRIBUTE_RESULT, result);
             model.addAttribute(ATTRIBUTE_ERROR_MESSAGE, errorMsg);
             return TEMPLATE_PATIENT_UPDATE;
