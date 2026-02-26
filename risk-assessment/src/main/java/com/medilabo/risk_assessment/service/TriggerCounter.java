@@ -27,6 +27,7 @@ final class TriggerCounter {
             "microalbumine",
             "taille",
             "fumeur", "fumeuse",
+            "poids",
             "anormal",
             "cholestérol", "cholesterol",
             "vertiges", "vertige",
