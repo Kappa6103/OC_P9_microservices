@@ -48,6 +48,7 @@ For testing and demonstration purposes, the Docker Compose file also launches a 
 # Installation & Run
 
 **Prerequisites**
+* jdk 21
 * maven
 * docker
 
