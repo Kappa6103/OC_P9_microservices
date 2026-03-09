@@ -24,7 +24,7 @@ For testing and demonstration purposes, the Docker Compose file also launches a 
 # Technologies used
 
 * Core
-  *   **Java 21**: The project uses the Long-Term Support (LTS) version of Java.
+  *   **Java 21**: The project uses the Long-Term Support (LTS) version of Java. Eclipse Temurin EOL Dec 2029.
   *   **Spring Boot 3.5.8**: The underlying framework for all microservices.
   *   **Spring Cloud (2025.0.0)**: Used for microservices coordination, specifically through the **Spring Cloud Gateway (WebMVC)** in the `api-gateway-webmvc` module.
   *   **Maven**: Dependency management and build tool.
