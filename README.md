@@ -52,7 +52,7 @@ For testing and demonstration purposes, the Docker Compose file also launches a 
 * maven
 * docker
 
-**Intallation**
+**Installation**
 * download source code
 * decompresse .zip file
 * cd into decompressed source folder
